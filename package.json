@@ -1,0 +1,23 @@
+{
+  "name": "knockgames-website",
+  "version": "1.0.0",
+  "description": "KnockGames.eu Minecraft Training Network Website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "minecraft",
+    "training",
+    "gaming",
+    "knockgames"
+  ],
+  "author": "KnockGames.eu",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "mysql2": "^3.14.1",
+    "pg": "^8.16.0"
+  }
+}

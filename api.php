@@ -113,6 +113,11 @@ switch (true) {
         configureMysQL();
         break;
     
+    // Minecraft Server Status
+    case $requestUri === '/api/minecraft/status' && $requestMethod === 'GET':
+        getMinecraftStatus();
+        break;
+    
     default:
         http_response_code(404);
         echo json_encode(['error' => 'Endpoint not found']);
@@ -857,5 +862,18 @@ function configureMysQL() {
         
         jsonResponse(['error' => $errorMessage], 400);
     }
+}
+
+// Minecraft Server Status
+function getMinecraftStatus() {
+    require_once 'minecraft-status.php';
+    
+    $host = $_GET['host'] ?? 'knockgames.eu';
+    $port = intval($_GET['port'] ?? 25565);
+    
+    $serverStatus = new MinecraftServerStatus($host, $port);
+    $status = $serverStatus->getServerStatus();
+    
+    jsonResponse($status);
 }
 ?>

@@ -272,6 +272,11 @@ app.post('/api/admin/users', isAuthenticated, async (req, res) => {
     const { username, password, email, role } = req.body;
     const users = await readJsonFile(USERS_FILE);
     
+    // Check if username already exists
+    if (users.find(u => u.username === username)) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+    
     const newUser = {
       id: Math.max(...users.map(u => u.id), 0) + 1,
       username,
@@ -289,6 +294,72 @@ app.post('/api/admin/users', isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+app.put('/api/admin/users/:id', isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { username, password, email, role } = req.body;
+    const users = await readJsonFile(USERS_FILE);
+    
+    const index = users.findIndex(u => u.id === parseInt(id));
+    if (index === -1) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Check if username already exists (excluding current user)
+    if (users.find(u => u.username === username && u.id !== parseInt(id))) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+    
+    // Update user data
+    users[index] = {
+      ...users[index],
+      username,
+      email: email || null,
+      role,
+      updated_at: new Date().toISOString()
+    };
+    
+    // Only update password if provided
+    if (password && password.trim() !== '') {
+      users[index].password = password;
+    }
+    
+    await writeJsonFile(USERS_FILE, users);
+    
+    const { password: _, ...safeUser } = users[index];
+    res.json(safeUser);
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+app.delete('/api/admin/users/:id', isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const users = await readJsonFile(USERS_FILE);
+    
+    const userToDelete = users.find(u => u.id === parseInt(id));
+    if (!userToDelete) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Prevent deleting the last admin user
+    const adminUsers = users.filter(u => u.role === 'admin');
+    if (userToDelete.role === 'admin' && adminUsers.length <= 1) {
+      return res.status(400).json({ error: 'Cannot delete the last admin user' });
+    }
+    
+    const filteredUsers = users.filter(u => u.id !== parseInt(id));
+    await writeJsonFile(USERS_FILE, filteredUsers);
+    
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: 'Failed to delete user' });
   }
 });
 

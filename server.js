@@ -124,6 +124,11 @@ async function writeJsonFile(filePath, data) {
 app.use(express.static('.'));
 app.use('/admin', express.static('admin'));
 
+// Admin route - serve index.html when accessing /admin
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin', 'index.html'));
+});
+
 // Root route serves main HTML file
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));

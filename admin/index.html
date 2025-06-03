@@ -14,19 +14,19 @@
         <div class="admin-login-card">
             <div class="admin-login-header">
                 <i class="fas fa-shield-alt admin-login-icon"></i>
-                <h2 class="admin-login-title">Admin Login</h2>
-                <p class="admin-login-subtitle">Access the KnockGames.eu admin panel</p>
+                <h2 class="admin-login-title">Admin Anmeldung</h2>
+                <p class="admin-login-subtitle">Zugang zum KnockGames.eu Admin Panel</p>
             </div>
             
             <form id="admin-login-form" class="admin-form">
                 <div class="admin-form-group">
-                    <label class="admin-label">Username</label>
-                    <input type="text" id="admin-username" class="admin-input" placeholder="Enter your username" required>
+                    <label class="admin-label">Benutzername</label>
+                    <input type="text" id="admin-username" class="admin-input" placeholder="Benutzername eingeben" required>
                 </div>
                 
                 <div class="admin-form-group">
-                    <label class="admin-label">Password</label>
-                    <input type="password" id="admin-password" class="admin-input" placeholder="Enter your password" required>
+                    <label class="admin-label">Passwort</label>
+                    <input type="password" id="admin-password" class="admin-input" placeholder="Passwort eingeben" required>
                 </div>
 
                 <div id="admin-login-error" class="admin-alert admin-alert-error hidden">
@@ -35,16 +35,16 @@
                 </div>
 
                 <button type="submit" class="admin-button" id="admin-login-btn">
-                    Login
+                    Anmelden
                 </button>
             </form>
 
             <div class="admin-alert admin-alert-info">
                 <i class="fas fa-info-circle"></i>
                 <div>
-                    <strong>Demo Credentials:</strong><br>
-                    Username: admin<br>
-                    Password: admin123
+                    <strong>Demo Zugangsdaten:</strong><br>
+                    Benutzername: admin<br>
+                    Passwort: admin123
                 </div>
             </div>
         </div>
@@ -58,13 +58,13 @@
                 <i class="fas fa-tachometer-alt"></i>
                 <div>
                     <h1 class="admin-title">Admin Dashboard</h1>
-                    <p style="color: #9ca3af; font-size: 0.875rem;">KnockGames.eu Content Management</p>
+                    <p style="color: #9ca3af; font-size: 0.875rem;">KnockGames.eu Inhaltsverwaltung</p>
                 </div>
             </div>
             <div class="admin-user-info">
-                <span style="color: #d1d5db;">Welcome, <span id="admin-username-display">admin</span></span>
+                <span style="color: #d1d5db;">Willkommen, <span id="admin-username-display">admin</span></span>
                 <button class="admin-logout" onclick="adminLogout()">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                    <i class="fas fa-sign-out-alt"></i> Abmelden
                 </button>
             </div>
         </header>
@@ -76,10 +76,10 @@
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </button>
                 <button class="tab-trigger" onclick="showAdminTab('users')">
-                    <i class="fas fa-users"></i> Users
+                    <i class="fas fa-users"></i> Benutzer
                 </button>
                 <button class="tab-trigger" onclick="showAdminTab('announcements')">
-                    <i class="fas fa-bullhorn"></i> Announcements
+                    <i class="fas fa-bullhorn"></i> Ankündigungen
                 </button>
                 <button class="tab-trigger" onclick="showAdminTab('news')">
                     <i class="fas fa-newspaper"></i> News
@@ -95,7 +95,7 @@
                     <div class="admin-stat-card">
                         <div class="admin-stat-header">
                             <i class="fas fa-users admin-stat-icon"></i>
-                            <span class="admin-stat-title">Total Users</span>
+                            <span class="admin-stat-title">Benutzer Gesamt</span>
                         </div>
                         <div class="admin-stat-value" id="total-users">0</div>
                     </div>
@@ -103,28 +103,28 @@
                     <div class="admin-stat-card">
                         <div class="admin-stat-header">
                             <i class="fas fa-bullhorn admin-stat-icon"></i>
-                            <span class="admin-stat-title">Announcements</span>
+                            <span class="admin-stat-title">Ankündigungen</span>
                         </div>
                         <div class="admin-stat-value" id="total-announcements">0</div>
-                        <div class="admin-stat-subtitle" id="active-announcements">0 active</div>
+                        <div class="admin-stat-subtitle" id="active-announcements">0 aktiv</div>
                     </div>
                     
                     <div class="admin-stat-card">
                         <div class="admin-stat-header">
                             <i class="fas fa-newspaper admin-stat-icon"></i>
-                            <span class="admin-stat-title">News Articles</span>
+                            <span class="admin-stat-title">News Artikel</span>
                         </div>
                         <div class="admin-stat-value" id="total-news">0</div>
-                        <div class="admin-stat-subtitle" id="published-news">0 published</div>
+                        <div class="admin-stat-subtitle" id="published-news">0 veröffentlicht</div>
                     </div>
                     
                     <div class="admin-stat-card">
                         <div class="admin-stat-header">
                             <i class="fas fa-graduation-cap admin-stat-icon"></i>
-                            <span class="admin-stat-title">Training Programs</span>
+                            <span class="admin-stat-title">Training Programme</span>
                         </div>
                         <div class="admin-stat-value" id="total-training">0</div>
-                        <div class="admin-stat-subtitle" id="active-training">0 active</div>
+                        <div class="admin-stat-subtitle" id="active-training">0 aktiv</div>
                     </div>
                 </div>
             </div>
@@ -135,16 +135,16 @@
                     <!-- Create/Edit User Form -->
                     <div class="admin-card">
                         <div class="admin-card-header">
-                            <h3 class="admin-card-title" id="user-form-title">Create New User</h3>
-                            <p class="admin-card-description">Add or edit user accounts</p>
+                            <h3 class="admin-card-title" id="user-form-title">Neuen Benutzer erstellen</h3>
+                            <p class="admin-card-description">Benutzerkonten hinzufügen oder bearbeiten</p>
                         </div>
                         <form id="user-form" class="admin-form">
                             <div class="admin-form-group">
-                                <label class="admin-label">Username</label>
+                                <label class="admin-label">Benutzername</label>
                                 <input type="text" id="user-username" class="admin-input" required>
                             </div>
                             <div class="admin-form-group">
-                                <label class="admin-label">Password</label>
+                                <label class="admin-label">Passwort</label>
                                 <input type="password" id="user-password" class="admin-input" required>
                             </div>
                             <div class="admin-form-group">
@@ -152,15 +152,15 @@
                                 <input type="email" id="user-email" class="admin-input">
                             </div>
                             <div class="admin-form-group">
-                                <label class="admin-label">Role</label>
+                                <label class="admin-label">Rolle</label>
                                 <select id="user-role" class="admin-input">
-                                    <option value="user">User</option>
-                                    <option value="admin">Admin</option>
+                                    <option value="user">Benutzer</option>
+                                    <option value="admin">Administrator</option>
                                 </select>
                             </div>
                             <div style="display: flex; gap: 0.5rem;">
-                                <button type="submit" class="admin-button" id="user-submit-btn">Create User</button>
-                                <button type="button" class="admin-button admin-button-secondary hidden" id="user-cancel-btn" onclick="cancelUserEdit()">Cancel</button>
+                                <button type="submit" class="admin-button" id="user-submit-btn">Benutzer erstellen</button>
+                                <button type="button" class="admin-button admin-button-secondary hidden" id="user-cancel-btn" onclick="cancelUserEdit()">Abbrechen</button>
                             </div>
                         </form>
                     </div>

@@ -603,6 +603,56 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+/* Badge Styles */
+.badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.admin {
+    background: var(--danger-color);
+    color: white;
+}
+
+.badge.moderator {
+    background: var(--warning-color);
+    color: #333;
+}
+
+.badge.user {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.badge.success {
+    background: var(--success-color);
+    color: white;
+}
+
+.badge.info {
+    background: var(--info-color);
+    color: white;
+}
+
+.badge.warning {
+    background: var(--warning-color);
+    color: #333;
+}
+
+.badge.error {
+    background: var(--danger-color);
+    color: white;
+}
+
+.badge.secondary {
+    background: var(--secondary-color);
+    color: white;
+}
+
 /* Alerts */
 .alert {
     padding: 1rem 1.5rem;

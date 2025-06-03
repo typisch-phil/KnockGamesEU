@@ -417,6 +417,6 @@ if ($db->isConnected()) {
     </div>
     <?php endif; ?>
     
-    <script src="/admin/admin.js"></script>
+    <script src="/admin/admin-clean.js"></script>
 </body>
 </html>

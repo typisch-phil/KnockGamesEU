@@ -702,71 +702,27 @@ function renderAnnouncements() {
 }
 
 function renderNews() {
-    const newsList = document.getElementById('news-list');
-    if (newsList) {
-        // Sort news based on current sort order
-        const sortedNews = sortItems([...adminData.news], adminData.sortOrder.news);
-        
-        newsList.innerHTML = `
-            <div class="admin-sort-controls">
-                <label class="admin-label">Sortieren nach:</label>
-                <select class="admin-input" style="width: auto; display: inline-block; margin-left: 0.5rem;" onchange="changeSortOrder('news', this.value)">
-                    <option value="date-desc" ${adminData.sortOrder.news === 'date-desc' ? 'selected' : ''}>Neueste zuerst</option>
-                    <option value="date-asc" ${adminData.sortOrder.news === 'date-asc' ? 'selected' : ''}>Älteste zuerst</option>
-                    <option value="title-asc" ${adminData.sortOrder.news === 'title-asc' ? 'selected' : ''}>Titel A-Z</option>
-                    <option value="title-desc" ${adminData.sortOrder.news === 'title-desc' ? 'selected' : ''}>Titel Z-A</option>
-                    <option value="status" ${adminData.sortOrder.news === 'status' ? 'selected' : ''}>Veröffentlichte zuerst</option>
-                </select>
-            </div>
-            ${sortedNews.map(article => `
-                <div class="admin-item">
-                    <div class="admin-item-header">
-                        <div>
-                            <h4 class="admin-item-title">${article.title}</h4>
-                            <p class="admin-item-content">${article.excerpt || article.content?.substring(0, 150) + '...'}</p>
-                            <div style="margin-top: 0.5rem;">
-                                ${article.published ? 
-                                    '<span class="admin-badge admin-badge-success"><i class="fas fa-eye"></i> Published</span>' : 
-                                    '<span class="admin-badge admin-badge-secondary"><i class="fas fa-eye-slash"></i> Draft</span>'
-                                }
-                                <span style="font-size: 0.75rem; color: #6b7280; margin-left: 0.5rem;">
-                                    Erstellt: ${formatDate(article.created_at || article.createdAt)}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="admin-item-actions">
-                            <button class="admin-button admin-button-secondary" style="padding: 0.5rem;" onclick="editNews(${article.id})">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="admin-button admin-button-danger" style="padding: 0.5rem;" onclick="deleteNews(${article.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('')}
-        `;
+    const tbody = document.getElementById('news-tbody');
+    if (tbody) {
+        tbody.innerHTML = adminData.news.map(article => `
+            <tr>
+                <td>${article.id}</td>
+                <td>${article.title}</td>
+                <td>${article.excerpt || article.content.substring(0, 50) + '...'}</td>
+                <td><span class="badge ${article.published ? 'success' : 'secondary'}">${article.published ? 'Veröffentlicht' : 'Entwurf'}</span></td>
+                <td>${new Date(article.created_at).toLocaleDateString('de-DE')}</td>
+                <td>
+                    <button class="action-btn edit" onclick="openNewsModal(${article.id})">Bearbeiten</button>
+                    <button class="action-btn delete" onclick="deleteNews(${article.id})">Löschen</button>
+                </td>
+            </tr>
+        `).join('');
     }
 }
 
 function renderTrainingPrograms() {
-    const trainingList = document.getElementById('training-list');
-    if (trainingList) {
-        trainingList.innerHTML = adminData.trainingPrograms.map(program => `
-            <div class="admin-item">
-                <div class="admin-item-header">
-                    <div>
-                        <h4 class="admin-item-title">${program.name}</h4>
-                        <p class="admin-item-content">${program.description}</p>
-                        <div style="margin-top: 0.5rem;">
-                            ${program.popular ? '<span class="admin-badge" style="background: var(--brand-orange);">Popular</span>' : ''}
-                            ${program.active ? 
-                                '<span class="admin-badge admin-badge-success">Active</span>' : 
-                                '<span class="admin-badge admin-badge-secondary">Inactive</span>'
-                            }
-                            <span style="font-size: 0.875rem; color: #9ca3af; margin-left: 0.5rem;">
-                                Price: ${program.price}
-                            </span>
+    // Training programs functionality can be added later
+}
                         </div>
                     </div>
                 </div>

@@ -782,6 +782,435 @@
             background: var(--brand-orange-dark);
         }
 
+        /* Admin Panel Styles */
+        .admin-container {
+            min-height: 100vh;
+            background: var(--dark-bg);
+            color: white;
+        }
+
+        .admin-header {
+            background: var(--dark-secondary);
+            border-bottom: 1px solid var(--dark-tertiary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .admin-logo i {
+            font-size: 2rem;
+            color: var(--brand-orange);
+        }
+
+        .admin-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--brand-orange), #ffb366);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .admin-user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-logout {
+            background: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-logout:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .admin-tabs {
+            padding: 2rem;
+        }
+
+        .tabs-list {
+            display: flex;
+            background: var(--dark-secondary);
+            border: 1px solid var(--dark-tertiary);
+            border-radius: 0.375rem;
+            padding: 0.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-trigger {
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            padding: 0.75rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-trigger.active {
+            background: var(--brand-orange);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .admin-card {
+            background: var(--dark-secondary);
+            border: 1px solid var(--dark-tertiary);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-card-header {
+            margin-bottom: 1rem;
+        }
+
+        .admin-card-title {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-card-description {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .admin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .admin-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .admin-label {
+            color: white;
+            font-weight: 500;
+        }
+
+        .admin-input,
+        .admin-textarea,
+        .admin-select {
+            background: var(--dark-tertiary);
+            border: 1px solid var(--dark-tertiary);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        .admin-input:focus,
+        .admin-textarea:focus,
+        .admin-select:focus {
+            outline: none;
+            border-color: var(--brand-orange);
+        }
+
+        .admin-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .admin-button {
+            background: var(--brand-orange);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-button:hover {
+            background: var(--brand-orange-dark);
+        }
+
+        .admin-button-secondary {
+            background: transparent;
+            border: 1px solid #6b7280;
+            color: #9ca3af;
+        }
+
+        .admin-button-secondary:hover {
+            background: #6b7280;
+            color: white;
+        }
+
+        .admin-button-danger {
+            background: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .admin-button-danger:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-stat-card {
+            background: var(--dark-secondary);
+            border: 1px solid var(--dark-tertiary);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .admin-stat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .admin-stat-icon {
+            color: var(--brand-orange);
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .admin-stat-title {
+            color: white;
+            font-weight: 600;
+        }
+
+        .admin-stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--brand-orange);
+        }
+
+        .admin-stat-subtitle {
+            font-size: 0.875rem;
+            color: #9ca3af;
+        }
+
+        .admin-item {
+            background: var(--dark-tertiary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .admin-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .admin-item-title {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .admin-item-content {
+            color: #d1d5db;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .admin-badge-success {
+            background: #059669;
+            color: white;
+        }
+
+        .admin-badge-warning {
+            background: #d97706;
+            color: white;
+        }
+
+        .admin-badge-error {
+            background: #dc2626;
+            color: white;
+        }
+
+        .admin-badge-info {
+            background: #2563eb;
+            color: white;
+        }
+
+        .admin-badge-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .admin-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .admin-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .admin-switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #6b7280;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .admin-switch-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .admin-switch input:checked + .admin-switch-slider {
+            background-color: var(--brand-orange);
+        }
+
+        .admin-switch input:checked + .admin-switch-slider:before {
+            transform: translateX(20px);
+        }
+
+        .admin-login-container {
+            min-height: 100vh;
+            background: var(--dark-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .admin-login-card {
+            background: var(--dark-secondary);
+            border: 1px solid var(--dark-tertiary);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .admin-login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-login-icon {
+            color: var(--brand-orange);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .admin-login-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-login-subtitle {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .admin-alert {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .admin-alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .admin-alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .flex-between {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .nav-menu {
@@ -811,6 +1240,24 @@
 
             .quick-connect-buttons {
                 flex-direction: column;
+            }
+
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .tabs-list {
+                flex-wrap: wrap;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
             }
         }
     </style>
@@ -1268,6 +1715,245 @@
         </div>
     </footer>
 
+    <!-- Admin Login Modal -->
+    <div id="admin-login" class="admin-login-container hidden">
+        <div class="admin-login-card">
+            <div class="admin-login-header">
+                <i class="fas fa-shield-alt admin-login-icon"></i>
+                <h2 class="admin-login-title">Admin Login</h2>
+                <p class="admin-login-subtitle">Access the KnockGames.eu admin panel</p>
+            </div>
+            
+            <form id="admin-login-form" class="admin-form">
+                <div class="admin-form-group">
+                    <label class="admin-label">Username</label>
+                    <input type="text" id="admin-username" class="admin-input" placeholder="Enter your username" required>
+                </div>
+                
+                <div class="admin-form-group">
+                    <label class="admin-label">Password</label>
+                    <input type="password" id="admin-password" class="admin-input" placeholder="Enter your password" required>
+                </div>
+
+                <div id="admin-login-error" class="admin-alert admin-alert-error hidden">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="admin-login-error-text"></span>
+                </div>
+
+                <button type="submit" class="admin-button" id="admin-login-btn">
+                    Login
+                </button>
+            </form>
+
+            <div class="admin-alert admin-alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Demo Credentials:</strong><br>
+                    Username: admin<br>
+                    Password: admin123
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="admin-container hidden">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="admin-logo">
+                <i class="fas fa-tachometer-alt"></i>
+                <div>
+                    <h1 class="admin-title">Admin Dashboard</h1>
+                    <p style="color: #9ca3af; font-size: 0.875rem;">KnockGames.eu Content Management</p>
+                </div>
+            </div>
+            <div class="admin-user-info">
+                <span style="color: #d1d5db;">Welcome, <span id="admin-username-display">admin</span></span>
+                <button class="admin-logout" onclick="adminLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+            <div class="tabs-list">
+                <button class="tab-trigger active" onclick="showAdminTab('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+                <button class="tab-trigger" onclick="showAdminTab('users')">
+                    <i class="fas fa-users"></i> Users
+                </button>
+                <button class="tab-trigger" onclick="showAdminTab('announcements')">
+                    <i class="fas fa-bullhorn"></i> Announcements
+                </button>
+                <button class="tab-trigger" onclick="showAdminTab('news')">
+                    <i class="fas fa-newspaper"></i> News
+                </button>
+                <button class="tab-trigger" onclick="showAdminTab('training')">
+                    <i class="fas fa-graduation-cap"></i> Training
+                </button>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="tab-dashboard" class="tab-content active">
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <i class="fas fa-users admin-stat-icon"></i>
+                            <span class="admin-stat-title">Total Users</span>
+                        </div>
+                        <div class="admin-stat-value" id="total-users">0</div>
+                    </div>
+                    
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <i class="fas fa-bullhorn admin-stat-icon"></i>
+                            <span class="admin-stat-title">Announcements</span>
+                        </div>
+                        <div class="admin-stat-value" id="total-announcements">0</div>
+                        <div class="admin-stat-subtitle" id="active-announcements">0 active</div>
+                    </div>
+                    
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <i class="fas fa-newspaper admin-stat-icon"></i>
+                            <span class="admin-stat-title">News Articles</span>
+                        </div>
+                        <div class="admin-stat-value" id="total-news">0</div>
+                        <div class="admin-stat-subtitle" id="published-news">0 published</div>
+                    </div>
+                    
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <i class="fas fa-graduation-cap admin-stat-icon"></i>
+                            <span class="admin-stat-title">Training Programs</span>
+                        </div>
+                        <div class="admin-stat-value" id="total-training">0</div>
+                        <div class="admin-stat-subtitle" id="active-training">0 active</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="tab-users" class="tab-content">
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">User Management</h3>
+                        <p class="admin-card-description">Manage registered users and their roles</p>
+                    </div>
+                    <div id="users-list"></div>
+                </div>
+            </div>
+
+            <!-- Announcements Tab -->
+            <div id="tab-announcements" class="tab-content">
+                <div class="admin-grid">
+                    <!-- Create Announcement Form -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h3 class="admin-card-title" id="announcement-form-title">Create Announcement</h3>
+                        </div>
+                        <form id="announcement-form" class="admin-form">
+                            <div class="admin-form-group">
+                                <label class="admin-label">Title</label>
+                                <input type="text" id="announcement-title" class="admin-input" required>
+                            </div>
+                            <div class="admin-form-group">
+                                <label class="admin-label">Content</label>
+                                <textarea id="announcement-content" class="admin-textarea" rows="4" required></textarea>
+                            </div>
+                            <div class="admin-form-group">
+                                <label class="admin-label">Type</label>
+                                <select id="announcement-type" class="admin-select">
+                                    <option value="info">Info</option>
+                                    <option value="warning">Warning</option>
+                                    <option value="success">Success</option>
+                                    <option value="error">Error</option>
+                                </select>
+                            </div>
+                            <div class="flex-between">
+                                <label class="admin-switch">
+                                    <input type="checkbox" id="announcement-active" checked>
+                                    <span class="admin-switch-slider"></span>
+                                </label>
+                                <span class="admin-label">Active</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="submit" class="admin-button" id="announcement-submit-btn">Create</button>
+                                <button type="button" class="admin-button admin-button-secondary hidden" id="announcement-cancel-btn" onclick="cancelAnnouncementEdit()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Announcements List -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h3 class="admin-card-title">Announcements</h3>
+                        </div>
+                        <div id="announcements-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Tab -->
+            <div id="tab-news" class="tab-content">
+                <div class="admin-grid">
+                    <!-- Create News Form -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h3 class="admin-card-title" id="news-form-title">Create News Article</h3>
+                        </div>
+                        <form id="news-form" class="admin-form">
+                            <div class="admin-form-group">
+                                <label class="admin-label">Title</label>
+                                <input type="text" id="news-title" class="admin-input" required>
+                            </div>
+                            <div class="admin-form-group">
+                                <label class="admin-label">Excerpt</label>
+                                <textarea id="news-excerpt" class="admin-textarea" rows="2"></textarea>
+                            </div>
+                            <div class="admin-form-group">
+                                <label class="admin-label">Content</label>
+                                <textarea id="news-content" class="admin-textarea" rows="6" required></textarea>
+                            </div>
+                            <div class="flex-between">
+                                <label class="admin-switch">
+                                    <input type="checkbox" id="news-published">
+                                    <span class="admin-switch-slider"></span>
+                                </label>
+                                <span class="admin-label">Published</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="submit" class="admin-button" id="news-submit-btn">Create</button>
+                                <button type="button" class="admin-button admin-button-secondary hidden" id="news-cancel-btn" onclick="cancelNewsEdit()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- News List -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h3 class="admin-card-title">News Articles</h3>
+                        </div>
+                        <div id="news-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Tab -->
+            <div id="tab-training" class="tab-content">
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">Training Programs</h3>
+                        <p class="admin-card-description">Manage training programs and courses</p>
+                    </div>
+                    <div id="training-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Smooth scrolling function
         function scrollToSection(sectionId) {
@@ -1519,7 +2205,467 @@
 
             // Start server status updates
             startStatusUpdates();
+            
+            // Initialize admin panel
+            initializeAdminPanel();
         });
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Admin Panel State
+        let adminData = {
+            isLoggedIn: false,
+            sessionId: null,
+            currentUser: null,
+            users: [],
+            announcements: [],
+            news: [],
+            trainingPrograms: [],
+            editingAnnouncement: null,
+            editingNews: null
+        };
+
+        // Initialize Admin Panel
+        function initializeAdminPanel() {
+            // Admin Login Form
+            const loginForm = document.getElementById('admin-login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const username = document.getElementById('admin-username').value;
+                    const password = document.getElementById('admin-password').value;
+                    const loginBtn = document.getElementById('admin-login-btn');
+                    const errorDiv = document.getElementById('admin-login-error');
+                    const errorText = document.getElementById('admin-login-error-text');
+
+                    loginBtn.textContent = 'Logging in...';
+                    loginBtn.disabled = true;
+                    errorDiv.classList.add('hidden');
+
+                    try {
+                        const response = await fetch('/api/auth/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ username, password })
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                            throw new Error(data.error || 'Login failed');
+                        }
+
+                        adminData.isLoggedIn = true;
+                        adminData.sessionId = data.sessionId;
+                        adminData.currentUser = data.user;
+                        localStorage.setItem('adminSessionId', data.sessionId);
+
+                        document.getElementById('admin-username-display').textContent = data.user.username;
+                        
+                        hideAdminLogin();
+                        showAdminDashboard();
+                        
+                    } catch (error) {
+                        errorText.textContent = error.message;
+                        errorDiv.classList.remove('hidden');
+                    } finally {
+                        loginBtn.textContent = 'Login';
+                        loginBtn.disabled = false;
+                    }
+                });
+            }
+
+            // Announcement Form
+            const announcementForm = document.getElementById('announcement-form');
+            if (announcementForm) {
+                announcementForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        title: document.getElementById('announcement-title').value,
+                        content: document.getElementById('announcement-content').value,
+                        type: document.getElementById('announcement-type').value,
+                        active: document.getElementById('announcement-active').checked
+                    };
+
+                    try {
+                        if (adminData.editingAnnouncement) {
+                            await apiRequest(`/api/admin/announcements/${adminData.editingAnnouncement.id}`, {
+                                method: 'PUT',
+                                body: JSON.stringify(formData)
+                            });
+                        } else {
+                            await apiRequest('/api/admin/announcements', {
+                                method: 'POST',
+                                body: JSON.stringify(formData)
+                            });
+                        }
+
+                        announcementForm.reset();
+                        document.getElementById('announcement-active').checked = true;
+                        cancelAnnouncementEdit();
+                        loadAdminData();
+                    } catch (error) {
+                        alert('Error: ' + error.message);
+                    }
+                });
+            }
+
+            // News Form
+            const newsForm = document.getElementById('news-form');
+            if (newsForm) {
+                newsForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        title: document.getElementById('news-title').value,
+                        excerpt: document.getElementById('news-excerpt').value,
+                        content: document.getElementById('news-content').value,
+                        published: document.getElementById('news-published').checked
+                    };
+
+                    try {
+                        if (adminData.editingNews) {
+                            await apiRequest(`/api/admin/news/${adminData.editingNews.id}`, {
+                                method: 'PUT',
+                                body: JSON.stringify(formData)
+                            });
+                        } else {
+                            await apiRequest('/api/admin/news', {
+                                method: 'POST',
+                                body: JSON.stringify(formData)
+                            });
+                        }
+
+                        newsForm.reset();
+                        cancelNewsEdit();
+                        loadAdminData();
+                    } catch (error) {
+                        alert('Error: ' + error.message);
+                    }
+                });
+            }
+
+            // Check for existing session
+            const savedSessionId = localStorage.getItem('adminSessionId');
+            if (savedSessionId) {
+                adminData.sessionId = savedSessionId;
+                apiRequest('/api/auth/me').then(user => {
+                    adminData.isLoggedIn = true;
+                    adminData.currentUser = user;
+                    document.getElementById('admin-username-display').textContent = user.username;
+                }).catch(() => {
+                    localStorage.removeItem('adminSessionId');
+                    adminData.sessionId = null;
+                });
+            }
+        }
+
+        // Admin Panel Functions
+        function showAdminLogin() {
+            document.getElementById('admin-login').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideAdminLogin() {
+            document.getElementById('admin-login').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            loadAdminData();
+        }
+
+        function hideAdminDashboard() {
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showAdminTab(tabName) {
+            document.querySelectorAll('.tab-trigger').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // API Helper Functions
+        async function apiRequest(url, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (adminData.sessionId) {
+                headers.Authorization = `Bearer ${adminData.sessionId}`;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Request failed');
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API Request failed:', error);
+                throw error;
+            }
+        }
+
+        function adminLogout() {
+            adminData.isLoggedIn = false;
+            adminData.sessionId = null;
+            adminData.currentUser = null;
+            localStorage.removeItem('adminSessionId');
+            hideAdminDashboard();
+            
+            document.getElementById('admin-login-form').reset();
+            document.getElementById('admin-login-error').classList.add('hidden');
+        }
+
+        async function loadAdminData() {
+            try {
+                const [users, announcements, news, trainingPrograms] = await Promise.all([
+                    apiRequest('/api/admin/users'),
+                    apiRequest('/api/admin/announcements'),
+                    apiRequest('/api/admin/news'),
+                    apiRequest('/api/admin/training-programs')
+                ]);
+
+                adminData.users = users;
+                adminData.announcements = announcements;
+                adminData.news = news;
+                adminData.trainingPrograms = trainingPrograms;
+
+                updateDashboardStats();
+                renderUsers();
+                renderAnnouncements();
+                renderNews();
+                renderTrainingPrograms();
+            } catch (error) {
+                console.error('Failed to load admin data:', error);
+            }
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('total-users').textContent = adminData.users.length;
+            document.getElementById('total-announcements').textContent = adminData.announcements.length;
+            document.getElementById('active-announcements').textContent = 
+                `${adminData.announcements.filter(a => a.active).length} active`;
+            document.getElementById('total-news').textContent = adminData.news.length;
+            document.getElementById('published-news').textContent = 
+                `${adminData.news.filter(n => n.published).length} published`;
+            document.getElementById('total-training').textContent = adminData.trainingPrograms.length;
+            document.getElementById('active-training').textContent = 
+                `${adminData.trainingPrograms.filter(t => t.active).length} active`;
+        }
+
+        function renderUsers() {
+            const usersList = document.getElementById('users-list');
+            if (usersList) {
+                usersList.innerHTML = adminData.users.map(user => `
+                    <div class="admin-item">
+                        <div class="admin-item-header">
+                            <div>
+                                <h4 class="admin-item-title">${user.username}</h4>
+                                <p class="admin-item-content">
+                                    Role: <span class="admin-badge ${user.role === 'admin' ? 'admin-badge-error' : 'admin-badge-secondary'}">${user.role}</span>
+                                </p>
+                                <p style="font-size: 0.75rem; color: #6b7280;">
+                                    Created: ${new Date(user.createdAt).toLocaleDateString()}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderAnnouncements() {
+            const announcementsList = document.getElementById('announcements-list');
+            if (announcementsList) {
+                announcementsList.innerHTML = adminData.announcements.map(announcement => `
+                    <div class="admin-item">
+                        <div class="admin-item-header">
+                            <div>
+                                <h4 class="admin-item-title">${announcement.title}</h4>
+                                <p class="admin-item-content">${announcement.content}</p>
+                                <div style="margin-top: 0.5rem;">
+                                    <span class="admin-badge admin-badge-${announcement.type}">${announcement.type}</span>
+                                    ${announcement.active ? 
+                                        '<span class="admin-badge admin-badge-success"><i class="fas fa-eye"></i> Active</span>' : 
+                                        '<span class="admin-badge admin-badge-secondary"><i class="fas fa-eye-slash"></i> Inactive</span>'
+                                    }
+                                </div>
+                            </div>
+                            <div class="admin-item-actions">
+                                <button class="admin-button admin-button-secondary" style="padding: 0.5rem;" onclick="editAnnouncement(${announcement.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="admin-button admin-button-danger" style="padding: 0.5rem;" onclick="deleteAnnouncement(${announcement.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderNews() {
+            const newsList = document.getElementById('news-list');
+            if (newsList) {
+                newsList.innerHTML = adminData.news.map(article => `
+                    <div class="admin-item">
+                        <div class="admin-item-header">
+                            <div>
+                                <h4 class="admin-item-title">${article.title}</h4>
+                                <p class="admin-item-content">${article.excerpt}</p>
+                                <div style="margin-top: 0.5rem;">
+                                    ${article.published ? 
+                                        '<span class="admin-badge admin-badge-success"><i class="fas fa-eye"></i> Published</span>' : 
+                                        '<span class="admin-badge admin-badge-secondary"><i class="fas fa-eye-slash"></i> Draft</span>'
+                                    }
+                                    <span style="font-size: 0.75rem; color: #6b7280; margin-left: 0.5rem;">
+                                        ${new Date(article.createdAt).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="admin-item-actions">
+                                <button class="admin-button admin-button-secondary" style="padding: 0.5rem;" onclick="editNews(${article.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="admin-button admin-button-danger" style="padding: 0.5rem;" onclick="deleteNews(${article.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderTrainingPrograms() {
+            const trainingList = document.getElementById('training-list');
+            if (trainingList) {
+                trainingList.innerHTML = adminData.trainingPrograms.map(program => `
+                    <div class="admin-item">
+                        <div class="admin-item-header">
+                            <div>
+                                <h4 class="admin-item-title">${program.name}</h4>
+                                <p class="admin-item-content">${program.description}</p>
+                                <div style="margin-top: 0.5rem;">
+                                    ${program.popular ? '<span class="admin-badge" style="background: var(--brand-orange);">Popular</span>' : ''}
+                                    ${program.active ? 
+                                        '<span class="admin-badge admin-badge-success">Active</span>' : 
+                                        '<span class="admin-badge admin-badge-secondary">Inactive</span>'
+                                    }
+                                    <span style="font-size: 0.875rem; color: #9ca3af; margin-left: 0.5rem;">
+                                        Price: ${program.price}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function editAnnouncement(id) {
+            const announcement = adminData.announcements.find(a => a.id === id);
+            if (!announcement) return;
+
+            adminData.editingAnnouncement = announcement;
+            
+            document.getElementById('announcement-title').value = announcement.title;
+            document.getElementById('announcement-content').value = announcement.content;
+            document.getElementById('announcement-type').value = announcement.type;
+            document.getElementById('announcement-active').checked = announcement.active;
+            
+            document.getElementById('announcement-form-title').textContent = 'Edit Announcement';
+            document.getElementById('announcement-submit-btn').textContent = 'Update';
+            document.getElementById('announcement-cancel-btn').classList.remove('hidden');
+        }
+
+        function cancelAnnouncementEdit() {
+            adminData.editingAnnouncement = null;
+            document.getElementById('announcement-form').reset();
+            document.getElementById('announcement-active').checked = true;
+            document.getElementById('announcement-form-title').textContent = 'Create Announcement';
+            document.getElementById('announcement-submit-btn').textContent = 'Create';
+            document.getElementById('announcement-cancel-btn').classList.add('hidden');
+        }
+
+        async function deleteAnnouncement(id) {
+            if (!confirm('Are you sure you want to delete this announcement?')) return;
+            
+            try {
+                await apiRequest(`/api/admin/announcements/${id}`, {
+                    method: 'DELETE'
+                });
+                loadAdminData();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function editNews(id) {
+            const article = adminData.news.find(n => n.id === id);
+            if (!article) return;
+
+            adminData.editingNews = article;
+            
+            document.getElementById('news-title').value = article.title;
+            document.getElementById('news-excerpt').value = article.excerpt;
+            document.getElementById('news-content').value = article.content;
+            document.getElementById('news-published').checked = article.published;
+            
+            document.getElementById('news-form-title').textContent = 'Edit News Article';
+            document.getElementById('news-submit-btn').textContent = 'Update';
+            document.getElementById('news-cancel-btn').classList.remove('hidden');
+        }
+
+        function cancelNewsEdit() {
+            adminData.editingNews = null;
+            document.getElementById('news-form').reset();
+            document.getElementById('news-form-title').textContent = 'Create News Article';
+            document.getElementById('news-submit-btn').textContent = 'Create';
+            document.getElementById('news-cancel-btn').classList.add('hidden');
+        }
+
+        async function deleteNews(id) {
+            if (!confirm('Are you sure you want to delete this news article?')) return;
+            
+            try {
+                await apiRequest(`/api/admin/news/${id}`, {
+                    method: 'DELETE'
+                });
+                loadAdminData();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Expose admin login function globally for testing
+        window.showAdminLogin = showAdminLogin;
     </script>
 </body>
 </html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KnockGames.eu - Admin Panel</title>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURBVFiFtZdPbBNVFMV/780MnU5n2tIOLS0tLVBKS2kpf1pKoYKAJiQECQmJiYnRhcaNG2PihsS4cOPChQs3xoUbE1ckJiYuTExMXBgTE2NiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJi">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Admin Login Modal -->
+    <div id="admin-login" class="admin-login-container">
+        <div class="admin-login-card">
+            <div class="admin-login-header">
+                <i class="fas fa-shield-alt admin-login-icon"></i>
+                <h2 class="admin-login-title">Admin Login</h2>
+                <p class="admin-login-subtitle">Access the KnockGames.eu admin panel</p>
+            </div>
+            
+            <form id="admin-login-form" class="admin-form">
+                <div class="admin-form-group">
+                    <label class="admin-label">Username</label>
+                    <input type="text" id="admin-username" class="admin-input" placeholder="Enter your username" required>
+                </div>
+                
+                <div class="admin-form-group">
+                    <label class="admin-label">Password</label>
+                    <input type="password" id="admin-password" class="admin-input" placeholder="Enter your password" required>
+                </div>
+
+                <div id="admin-login-error" class="admin-alert admin-alert-error hidden">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="admin-login-error-text"></span>
+                </div>
+
+                <button type="submit" class="admin-button" id="admin-login-btn">
+                    Login
+                </button>
+            </form>
+
+            <div class="admin-alert admin-alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Demo Credentials:</strong><br>
+                    Username: admin<br>
+                    Password: admin123
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="admin-container hidden">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="admin-logo">
+                <i class="fas fa-tachometer-alt"></i>
+                <div>
+                    <h1 class="admin-title">Admin Dashboard</h1>
+                    <p style="color: #9ca3af; font-size: 0.875rem;">KnockGames.eu Content Management</p>
+                </div>
+            </div>
+            <div class="admin-user-info">
+                <span style="color: #d1d5db;">Welcome, <span id="admin-username-display">admin</span></span>
+                <button class="admin-logout" onclick="adminLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+            <div class="tabs-list">
+                <button class="tab-trigger active" onclick="showAdminTab('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+                <button class="tab-trigger" onclick="showAdminTab('users')">
+                    <i class="fas fa-users"></i> Users
+                </button>
+                <button class="tab-trigger" onclick="showAdminTab('announcements')">
+                    <i class="fas fa-bullhorn"></i> Announcements
+                </button>
+                <button class="tab-trigger" onclick="showAdminTab('news')">
+                    <i class="fas fa-newspaper"></i> News
+                </button>
+                <button class="tab-trigger" onclick="showAdminTab('training')">
+                    <i class="fas fa-graduation-cap"></i> Training
+                </button>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="tab-dashboard" class="tab-content active">
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <i class="fas fa-users admin-stat-icon"></i>
+                            <span class="admin-stat-title">Total Users</span>
+                        </div>
+                        <div class="admin-stat-value" id="total-users">0</div>
+                    </div>
+                    
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <i class="fas fa-bullhorn admin-stat-icon"></i>
+                            <span class="admin-stat-title">Announcements</span>
+                        </div>
+                        <div class="admin-stat-value" id="total-announcements">0</div>
+                        <div class="admin-stat-subtitle" id="active-announcements">0 active</div>
+                    </div>
+                    
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <i class="fas fa-newspaper admin-stat-icon"></i>
+                            <span class="admin-stat-title">News Articles</span>
+                        </div>
+                        <div class="admin-stat-value" id="total-news">0</div>
+                        <div class="admin-stat-subtitle" id="published-news">0 published</div>
+                    </div>
+                    
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-header">
+                            <i class="fas fa-graduation-cap admin-stat-icon"></i>
+                            <span class="admin-stat-title">Training Programs</span>
+                        </div>
+                        <div class="admin-stat-value" id="total-training">0</div>
+                        <div class="admin-stat-subtitle" id="active-training">0 active</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="tab-users" class="tab-content">
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">User Management</h3>
+                        <p class="admin-card-description">Manage registered users and their roles</p>
+                    </div>
+                    <div id="users-list"></div>
+                </div>
+            </div>
+
+            <!-- Announcements Tab -->
+            <div id="tab-announcements" class="tab-content">
+                <div class="admin-grid">
+                    <!-- Create Announcement Form -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h3 class="admin-card-title" id="announcement-form-title">Create Announcement</h3>
+                        </div>
+                        <form id="announcement-form" class="admin-form">
+                            <div class="admin-form-group">
+                                <label class="admin-label">Title</label>
+                                <input type="text" id="announcement-title" class="admin-input" required>
+                            </div>
+                            <div class="admin-form-group">
+                                <label class="admin-label">Content</label>
+                                <textarea id="announcement-content" class="admin-textarea" rows="4" required></textarea>
+                            </div>
+                            <div class="admin-form-group">
+                                <label class="admin-label">Type</label>
+                                <select id="announcement-type" class="admin-select">
+                                    <option value="info">Info</option>
+                                    <option value="warning">Warning</option>
+                                    <option value="success">Success</option>
+                                    <option value="error">Error</option>
+                                </select>
+                            </div>
+                            <div class="flex-between">
+                                <label class="admin-switch">
+                                    <input type="checkbox" id="announcement-active" checked>
+                                    <span class="admin-switch-slider"></span>
+                                </label>
+                                <span class="admin-label">Active</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="submit" class="admin-button" id="announcement-submit-btn">Create</button>
+                                <button type="button" class="admin-button admin-button-secondary hidden" id="announcement-cancel-btn" onclick="cancelAnnouncementEdit()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Announcements List -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h3 class="admin-card-title">Announcements</h3>
+                        </div>
+                        <div id="announcements-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Tab -->
+            <div id="tab-news" class="tab-content">
+                <div class="admin-grid">
+                    <!-- Create News Form -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h3 class="admin-card-title" id="news-form-title">Create News Article</h3>
+                        </div>
+                        <form id="news-form" class="admin-form">
+                            <div class="admin-form-group">
+                                <label class="admin-label">Title</label>
+                                <input type="text" id="news-title" class="admin-input" required>
+                            </div>
+                            <div class="admin-form-group">
+                                <label class="admin-label">Excerpt</label>
+                                <textarea id="news-excerpt" class="admin-textarea" rows="2"></textarea>
+                            </div>
+                            <div class="admin-form-group">
+                                <label class="admin-label">Content</label>
+                                <textarea id="news-content" class="admin-textarea" rows="6" required></textarea>
+                            </div>
+                            <div class="flex-between">
+                                <label class="admin-switch">
+                                    <input type="checkbox" id="news-published">
+                                    <span class="admin-switch-slider"></span>
+                                </label>
+                                <span class="admin-label">Published</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="submit" class="admin-button" id="news-submit-btn">Create</button>
+                                <button type="button" class="admin-button admin-button-secondary hidden" id="news-cancel-btn" onclick="cancelNewsEdit()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- News List -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h3 class="admin-card-title">News Articles</h3>
+                        </div>
+                        <div id="news-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Tab -->
+            <div id="tab-training" class="tab-content">
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">Training Programs</h3>
+                        <p class="admin-card-description">Manage training programs and courses</p>
+                    </div>
+                    <div id="training-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

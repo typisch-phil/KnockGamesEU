@@ -1,10 +1,25 @@
 <?php
 // KnockGames.eu - Datenbankkonfiguration
-define('DB_HOST', 'localhost');
-define('DB_PORT', 3306);
-define('DB_NAME', 'knockgames');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// PostgreSQL-Verbindung über Umgebungsvariablen
+$databaseUrl = getenv('DATABASE_URL');
+if ($databaseUrl) {
+    // Parse DATABASE_URL für PostgreSQL
+    $dbParts = parse_url($databaseUrl);
+    define('DB_HOST', $dbParts['host']);
+    define('DB_PORT', $dbParts['port']);
+    define('DB_NAME', ltrim($dbParts['path'], '/'));
+    define('DB_USER', $dbParts['user']);
+    define('DB_PASS', $dbParts['pass']);
+    define('DB_TYPE', 'pgsql');
+} else {
+    // Fallback auf MySQL
+    define('DB_HOST', 'localhost');
+    define('DB_PORT', 3306);
+    define('DB_NAME', 'knockgames');
+    define('DB_USER', 'root');
+    define('DB_PASS', '');
+    define('DB_TYPE', 'mysql');
+}
 
 // Session Konfiguration
 define('ADMIN_USERNAME', 'admin');
@@ -21,16 +36,21 @@ class Database {
     
     private function __construct() {
         try {
-            $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+            if (DB_TYPE === 'pgsql') {
+                $dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME;
+            } else {
+                $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+            }
+            
             $this->connection = new PDO($dsn, DB_USER, DB_PASS, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false
             ]);
         } catch (PDOException $e) {
-            // Fallback auf JSON-Dateien wenn MySQL nicht verfügbar
+            // Fallback auf JSON-Dateien wenn Datenbank nicht verfügbar
             $this->connection = null;
-            error_log("MySQL Connection failed: " . $e->getMessage());
+            error_log("Database Connection failed: " . $e->getMessage());
         }
     }
     
@@ -106,68 +126,113 @@ function initializeData() {
     $db = Database::getInstance();
     
     if ($db->isConnected()) {
-        // MySQL-Tabellen erstellen falls sie nicht existieren
+        // Datenbank-Tabellen erstellen falls sie nicht existieren
         $pdo = $db->getConnection();
         
-        // Users Tabelle
-        $pdo->exec("CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
-            email VARCHAR(255),
-            role ENUM('admin', 'user') DEFAULT 'user',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )");
-        
-        // Announcements Tabelle
-        $pdo->exec("CREATE TABLE IF NOT EXISTS announcements (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
-            content TEXT NOT NULL,
-            type ENUM('info', 'warning', 'success', 'error') DEFAULT 'info',
-            active BOOLEAN DEFAULT true,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )");
-        
-        // News Tabelle
-        $pdo->exec("CREATE TABLE IF NOT EXISTS news_articles (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
-            content TEXT NOT NULL,
-            excerpt TEXT,
-            published BOOLEAN DEFAULT false,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )");
+        if (DB_TYPE === 'pgsql') {
+            // PostgreSQL-Tabellen
+            $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                username VARCHAR(255) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL,
+                email VARCHAR(255),
+                role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('admin', 'user')),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )");
+            
+            $pdo->exec("CREATE TABLE IF NOT EXISTS announcements (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                content TEXT NOT NULL,
+                type VARCHAR(20) DEFAULT 'info' CHECK (type IN ('info', 'warning', 'success', 'error')),
+                active BOOLEAN DEFAULT true,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )");
+            
+            $pdo->exec("CREATE TABLE IF NOT EXISTS news_articles (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                content TEXT NOT NULL,
+                excerpt TEXT,
+                published BOOLEAN DEFAULT false,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )");
+        } else {
+            // MySQL-Tabellen
+            $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(255) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL,
+                email VARCHAR(255),
+                role ENUM('admin', 'user') DEFAULT 'user',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )");
+            
+            $pdo->exec("CREATE TABLE IF NOT EXISTS announcements (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                content TEXT NOT NULL,
+                type ENUM('info', 'warning', 'success', 'error') DEFAULT 'info',
+                active BOOLEAN DEFAULT true,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )");
+            
+            $pdo->exec("CREATE TABLE IF NOT EXISTS news_articles (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                content TEXT NOT NULL,
+                excerpt TEXT,
+                published BOOLEAN DEFAULT false,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )");
+        }
         
         // Standard-Admin-Benutzer einfügen
-        $stmt = $pdo->prepare("INSERT IGNORE INTO users (username, password, role, email) VALUES (?, ?, 'admin', 'admin@knockgames.eu')");
+        if (DB_TYPE === 'pgsql') {
+            $stmt = $pdo->prepare("INSERT INTO users (username, password, role, email) VALUES (?, ?, 'admin', 'admin@knockgames.eu') ON CONFLICT (username) DO NOTHING");
+        } else {
+            $stmt = $pdo->prepare("INSERT IGNORE INTO users (username, password, role, email) VALUES (?, ?, 'admin', 'admin@knockgames.eu')");
+        }
         $stmt->execute([ADMIN_USERNAME, ADMIN_PASSWORD]);
         
         // Standard-Ankündigungen einfügen
         $announcements = [
-            ['Willkommen bei KnockGames!', 'Herzlich willkommen auf unserem Minecraft Training Server. Hier findest du die besten PvP-Trainingsmöglichkeiten.', 'success', 1],
-            ['Server Update', 'Unser Server wurde erfolgreich aktualisiert. Neue Features sind verfügbar!', 'info', 1],
-            ['Wartungsarbeiten', 'Geplante Wartungsarbeiten am Sonntag von 2-4 Uhr morgens.', 'warning', 1]
+            ['Willkommen bei KnockGames!', 'Herzlich willkommen auf unserem Minecraft Training Server. Hier findest du die besten PvP-Trainingsmöglichkeiten.', 'success', true],
+            ['Server Update', 'Unser Server wurde erfolgreich aktualisiert. Neue Features sind verfügbar!', 'info', true],
+            ['Wartungsarbeiten', 'Geplante Wartungsarbeiten am Sonntag von 2-4 Uhr morgens.', 'warning', true]
         ];
         
-        foreach ($announcements as $announcement) {
-            $stmt = $pdo->prepare("INSERT IGNORE INTO announcements (id, title, content, type, active) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([array_search($announcement, $announcements) + 1, ...$announcement]);
+        foreach ($announcements as $index => $announcement) {
+            if (DB_TYPE === 'pgsql') {
+                $stmt = $pdo->prepare("INSERT INTO announcements (title, content, type, active) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING");
+                $stmt->execute($announcement);
+            } else {
+                $stmt = $pdo->prepare("INSERT IGNORE INTO announcements (id, title, content, type, active) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$index + 1, ...$announcement]);
+            }
         }
         
         // Standard-News einfügen
         $news = [
-            ['Neue PvP Arena eröffnet', 'Wir freuen uns, die Eröffnung unserer brandneuen PvP Arena bekannt zu geben. Mit modernster Ausstattung und verschiedenen Kampfmodi bietet sie das ultimative Trainingsvergnügen.', 'Brandneue PvP Arena mit modernster Ausstattung jetzt verfügbar.', 1],
-            ['Training-Update 2.0', 'Das große Training-Update 2.0 ist da! Neue Übungsmodule, verbesserte KI-Gegner und erweiterte Statistiken warten auf euch.', 'Umfangreiches Update mit neuen Trainingsfeatures und Verbesserungen.', 1],
-            ['Community Event angekündigt', 'Unser erstes großes Community-Event findet nächsten Monat statt. Teilnehmer können exklusive Belohnungen und Ränge gewinnen.', 'Großes Community-Event mit exklusiven Belohnungen angekündigt.', 1]
+            ['Neue PvP Arena eröffnet', 'Wir freuen uns, die Eröffnung unserer brandneuen PvP Arena bekannt zu geben. Mit modernster Ausstattung und verschiedenen Kampfmodi bietet sie das ultimative Trainingsvergnügen.', 'Brandneue PvP Arena mit modernster Ausstattung jetzt verfügbar.', true],
+            ['Training-Update 2.0', 'Das große Training-Update 2.0 ist da! Neue Übungsmodule, verbesserte KI-Gegner und erweiterte Statistiken warten auf euch.', 'Umfangreiches Update mit neuen Trainingsfeatures und Verbesserungen.', true],
+            ['Community Event angekündigt', 'Unser erstes großes Community-Event findet nächsten Monat statt. Teilnehmer können exklusive Belohnungen und Ränge gewinnen.', 'Großes Community-Event mit exklusiven Belohnungen angekündigt.', true]
         ];
         
-        foreach ($news as $article) {
-            $stmt = $pdo->prepare("INSERT IGNORE INTO news_articles (id, title, content, excerpt, published) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([array_search($article, $news) + 1, ...$article]);
+        foreach ($news as $index => $article) {
+            if (DB_TYPE === 'pgsql') {
+                $stmt = $pdo->prepare("INSERT INTO news_articles (title, content, excerpt, published) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING");
+                $stmt->execute($article);
+            } else {
+                $stmt = $pdo->prepare("INSERT IGNORE INTO news_articles (id, title, content, excerpt, published) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$index + 1, ...$article]);
+            }
         }
         
         return true;

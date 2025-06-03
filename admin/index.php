@@ -165,8 +165,7 @@ if ($db->isConnected()) {
                 <li><a href="#users" class="nav-link" onclick="showSection('users')">👥 Benutzer</a></li>
                 <li><a href="#announcements" class="nav-link" onclick="showSection('announcements')">📢 Ankündigungen</a></li>
                 <li><a href="#news" class="nav-link" onclick="showSection('news')">📰 News</a></li>
-                <li><a href="/mysql-setup" class="nav-link">🔧 MySQL Setup</a></li>
-                <li><a href="/database-admin" class="nav-link">🗄️ Datenbank</a></li>
+                <li><a href="admin/mysql-setup.php" class="nav-link">🔧 MySQL Setup</a></li>
                 <li><a href="?logout=1" class="nav-link logout">🚪 Abmelden</a></li>
             </ul>
         </nav>
@@ -231,14 +230,11 @@ if ($db->isConnected()) {
                             <button class="btn btn-primary" onclick="showSection('news')">
                                 <span class="btn-icon">📰</span> News erstellen
                             </button>
-                            <a href="/mysql-setup" class="btn btn-secondary">
+                            <a href="admin/mysql-setup.php" class="btn btn-secondary">
                                 <span class="btn-icon">🔧</span> MySQL konfigurieren
                             </a>
-                            <a href="/phpmyadmin-setup" class="btn btn-secondary">
+                            <a href="admin/phpmyadmin-setup.php" class="btn btn-secondary">
                                 <span class="btn-icon">⚙️</span> phpMyAdmin Setup
-                            </a>
-                            <a href="/database-admin" class="btn btn-secondary">
-                                <span class="btn-icon">🗄️</span> Datenbank-Admin
                             </a>
                         </div>
                     </div>

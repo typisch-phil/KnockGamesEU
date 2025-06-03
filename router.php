@@ -52,6 +52,33 @@ if ($requestUri === '/mysql-setup' || $requestUri === '/mysql-setup/') {
     return;
 }
 
+if ($requestUri === '/phpmyadmin-setup' || $requestUri === '/phpmyadmin-setup/') {
+    require_once 'phpmyadmin-setup.php';
+    return;
+}
+
+// phpMyAdmin Weiterleitung
+if (strpos($requestUri, '/phpmyadmin') === 0) {
+    $phpMyAdminPath = __DIR__ . '/phpmyadmin';
+    if (is_dir($phpMyAdminPath)) {
+        // Entferne /phpmyadmin aus dem URI
+        $subPath = substr($requestUri, 11); // 11 = length of '/phpmyadmin'
+        if (empty($subPath) || $subPath === '/') {
+            $subPath = '/index.php';
+        }
+        
+        $targetFile = $phpMyAdminPath . $subPath;
+        if (file_exists($targetFile) && !is_dir($targetFile)) {
+            chdir($phpMyAdminPath);
+            require_once $targetFile;
+            return;
+        }
+    }
+    // Weiterleitung zum Setup falls phpMyAdmin nicht installiert
+    header('Location: /phpmyadmin-setup');
+    exit;
+}
+
 // Hauptseite - Verwende PHP-Version
 if ($requestUri === '/') {
     require_once 'index.php';

@@ -182,6 +182,9 @@ if ($db->isConnected()) {
                             <a href="/mysql-setup" class="btn btn-secondary">
                                 <span class="btn-icon">🔧</span> MySQL konfigurieren
                             </a>
+                            <a href="/phpmyadmin-setup" class="btn btn-secondary">
+                                <span class="btn-icon">⚙️</span> phpMyAdmin Setup
+                            </a>
                             <a href="/database-admin" class="btn btn-secondary">
                                 <span class="btn-icon">🗄️</span> Datenbank-Admin
                             </a>

@@ -111,6 +111,18 @@
     animation: bounce 3s infinite;
   }
 
+  .animate-pulse-orange {
+    animation: pulseOrange 4s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: floatSlow 8s ease-in-out infinite;
+  }
+
+  .animate-drift {
+    animation: drift 12s linear infinite;
+  }
+
   .parallax {
     background-attachment: fixed;
     background-position: center;
@@ -154,6 +166,41 @@
   }
   to { 
     opacity: 1; 
+  }
+}
+
+@keyframes pulseOrange {
+  0%, 100% { 
+    opacity: 0.4; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.2);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px); 
+  }
+  25% { 
+    transform: translateY(-30px) translateX(10px); 
+  }
+  50% { 
+    transform: translateY(-15px) translateX(-10px); 
+  }
+  75% { 
+    transform: translateY(-40px) translateX(5px); 
+  }
+}
+
+@keyframes drift {
+  0% { 
+    transform: translateX(-100px) rotate(0deg); 
+  }
+  100% { 
+    transform: translateX(calc(100vw + 100px)) rotate(360deg); 
   }
 }
 

@@ -12,12 +12,35 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="min-h-screen relative flex items-center justify-center parallax"
-      style={{
-        backgroundImage: `linear-gradient(rgba(15, 15, 15, 0.7), rgba(15, 15, 15, 0.7)), url('https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080')`,
-      }}
+      className="min-h-screen relative flex items-center justify-center bg-black overflow-hidden"
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[hsl(var(--dark-bg))/20] to-[hsl(var(--dark-bg))]"></div>
+      {/* Animated Orange Dots Background */}
+      <div className="absolute inset-0">
+        {/* Large floating dots */}
+        <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-[hsl(var(--brand-orange))] rounded-full animate-pulse-orange" style={{ animationDelay: "0s" }}></div>
+        <div className="absolute top-1/3 right-1/4 w-6 h-6 bg-[hsl(var(--brand-orange))] rounded-full animate-float-slow" style={{ animationDelay: "1s" }}></div>
+        <div className="absolute bottom-1/3 left-1/6 w-3 h-3 bg-[hsl(var(--brand-orange))] rounded-full animate-pulse-orange" style={{ animationDelay: "2s" }}></div>
+        <div className="absolute top-1/2 right-1/3 w-5 h-5 bg-[hsl(var(--brand-orange))] rounded-full animate-float-slow" style={{ animationDelay: "3s" }}></div>
+        <div className="absolute bottom-1/4 right-1/6 w-2 h-2 bg-[hsl(var(--brand-orange))] rounded-full animate-pulse-orange" style={{ animationDelay: "4s" }}></div>
+        
+        {/* Medium dots */}
+        <div className="absolute top-1/5 left-1/2 w-3 h-3 bg-[hsl(var(--brand-orange))] rounded-full animate-float-slow opacity-70" style={{ animationDelay: "1.5s" }}></div>
+        <div className="absolute bottom-1/2 left-1/3 w-4 h-4 bg-[hsl(var(--brand-orange))] rounded-full animate-pulse-orange opacity-60" style={{ animationDelay: "2.5s" }}></div>
+        <div className="absolute top-3/4 right-1/2 w-2 h-2 bg-[hsl(var(--brand-orange))] rounded-full animate-float-slow opacity-80" style={{ animationDelay: "3.5s" }}></div>
+        
+        {/* Small dots */}
+        <div className="absolute top-2/3 left-1/5 w-1 h-1 bg-[hsl(var(--brand-orange))] rounded-full animate-pulse-orange opacity-50" style={{ animationDelay: "0.5s" }}></div>
+        <div className="absolute bottom-1/5 right-1/5 w-1 h-1 bg-[hsl(var(--brand-orange))] rounded-full animate-float-slow opacity-60" style={{ animationDelay: "1.8s" }}></div>
+        <div className="absolute top-1/6 right-2/3 w-2 h-2 bg-[hsl(var(--brand-orange))] rounded-full animate-pulse-orange opacity-40" style={{ animationDelay: "2.8s" }}></div>
+        <div className="absolute bottom-2/3 left-2/3 w-1 h-1 bg-[hsl(var(--brand-orange))] rounded-full animate-float-slow opacity-70" style={{ animationDelay: "3.8s" }}></div>
+        
+        {/* Drifting dots */}
+        <div className="absolute top-1/4 w-2 h-2 bg-[hsl(var(--brand-orange))] rounded-full animate-drift opacity-30" style={{ animationDelay: "0s", animationDuration: "20s" }}></div>
+        <div className="absolute top-1/2 w-1 h-1 bg-[hsl(var(--brand-orange))] rounded-full animate-drift opacity-40" style={{ animationDelay: "5s", animationDuration: "25s" }}></div>
+        <div className="absolute top-3/4 w-3 h-3 bg-[hsl(var(--brand-orange))] rounded-full animate-drift opacity-20" style={{ animationDelay: "10s", animationDuration: "30s" }}></div>
+      </div>
+
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-[hsl(var(--dark-bg))]"></div>
 
       <div className="container mx-auto px-6 text-center relative z-10 animate-fade-in">
         <div className="animate-float">

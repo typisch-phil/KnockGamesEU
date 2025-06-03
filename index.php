@@ -413,21 +413,31 @@ if ($db->isConnected()) {
             }
         }
 
-        /* Server Status Widget */
-        .server-status-widget {
-            background: linear-gradient(135deg, rgba(255, 145, 36, 0.15) 0%, rgba(255, 145, 36, 0.05) 100%);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 2.5rem 0;
-            border: 2px solid rgba(255, 145, 36, 0.4);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            box-shadow: 0 10px 30px rgba(255, 145, 36, 0.1);
+        /* Server Status Kacheln */
+        .server-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .server-status-widget::before {
+        .status-tile {
+            background: linear-gradient(135deg, rgba(255, 145, 36, 0.15) 0%, rgba(255, 145, 36, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 1.5rem 1rem;
+            border: 2px solid rgba(255, 145, 36, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(255, 145, 36, 0.1);
+        }
+
+        .status-tile::before {
             content: '';
             position: absolute;
             top: 0;
@@ -435,139 +445,55 @@ if ($db->isConnected()) {
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 145, 36, 0.1), transparent);
-            transition: left 0.8s ease;
+            transition: left 0.6s ease;
         }
 
-        .server-status-widget:hover::before {
+        .status-tile:hover::before {
             left: 100%;
         }
 
-        .server-status-widget:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(255, 145, 36, 0.2);
-            border-color: rgba(255, 145, 36, 0.6);
+        .status-tile:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 145, 36, 0.2);
+            border-color: rgba(255, 145, 36, 0.5);
         }
 
-        .server-info {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
+        .tile-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 0 10px rgba(255, 145, 36, 0.5));
+        }
+
+        .tile-content {
             position: relative;
             z-index: 2;
         }
 
-        .server-icon {
-            font-size: 3rem;
-            filter: drop-shadow(0 0 15px rgba(255, 145, 36, 0.7));
-            animation: pulse-glow 2s infinite;
-        }
-
-        @keyframes pulse-glow {
-            0%, 100% { filter: drop-shadow(0 0 15px rgba(255, 145, 36, 0.7)); }
-            50% { filter: drop-shadow(0 0 25px rgba(255, 145, 36, 0.9)); }
-        }
-
-        .server-details {
-            flex: 1;
-        }
-
-        .server-details h3 {
+        .tile-label {
             color: #ff9124;
-            margin-bottom: 0.8rem;
-            font-size: 1.4rem;
-            font-weight: 700;
-            text-shadow: 0 0 10px rgba(255, 145, 36, 0.3);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tile-value {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
         }
 
         .status-online {
             color: #28a745;
-            font-weight: bold;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .status-online::before {
-            content: '';
-            width: 12px;
-            height: 12px;
-            background: #28a745;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #28a745;
-            animation: status-pulse 1.5s infinite;
-        }
-
-        @keyframes status-pulse {
-            0%, 100% { box-shadow: 0 0 10px #28a745; }
-            50% { box-shadow: 0 0 20px #28a745, 0 0 30px #28a745; }
         }
 
         .status-offline {
             color: #dc3545;
-            font-weight: bold;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .status-offline::before {
-            content: '';
-            width: 12px;
-            height: 12px;
-            background: #dc3545;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #dc3545;
         }
 
         .status-loading {
             color: #ffc107;
-            font-weight: bold;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .status-loading::before {
-            content: '';
-            width: 12px;
-            height: 12px;
-            background: #ffc107;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #ffc107;
-            animation: loading-spin 1s linear infinite;
-        }
-
-        @keyframes loading-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .server-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 0.8rem;
-            margin-top: 1rem;
-        }
-
-        .stat-item {
-            background: linear-gradient(135deg, rgba(255, 145, 36, 0.3) 0%, rgba(255, 145, 36, 0.1) 100%);
-            border: 1px solid rgba(255, 145, 36, 0.4);
-            padding: 0.8rem 1rem;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .stat-item:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg, rgba(255, 145, 36, 0.4) 0%, rgba(255, 145, 36, 0.2) 100%);
-            box-shadow: 0 5px 15px rgba(255, 145, 36, 0.2);
         }
 
         @media (max-width: 768px) {
@@ -632,13 +558,27 @@ if ($db->isConnected()) {
                 <p>Das ultimative Minecraft Training Network</p>
                 <p>Verbessere deine PvP-Fähigkeiten mit professionellen Trainingsmodulen</p>
                 
-                <!-- Server Status Widget -->
-                <div class="server-status-widget" id="serverStatus">
-                    <div class="server-info">
-                        <div class="server-icon">🎮</div>
-                        <div class="server-details">
-                            <h3>Server Status</h3>
-                            <div class="status-loading">Lade Server-Status...</div>
+                <!-- Server Status Kacheln -->
+                <div class="server-status-grid" id="serverStatus">
+                    <div class="status-tile">
+                        <div class="tile-icon">🟢</div>
+                        <div class="tile-content">
+                            <div class="tile-label">Server Status</div>
+                            <div class="tile-value status-loading">Lädt...</div>
+                        </div>
+                    </div>
+                    <div class="status-tile">
+                        <div class="tile-icon">👥</div>
+                        <div class="tile-content">
+                            <div class="tile-label">Spieler Online</div>
+                            <div class="tile-value" id="playerCount">-/-</div>
+                        </div>
+                    </div>
+                    <div class="status-tile">
+                        <div class="tile-icon">📋</div>
+                        <div class="tile-content">
+                            <div class="tile-label">Server Version</div>
+                            <div class="tile-value" id="serverVersion">-</div>
                         </div>
                     </div>
                 </div>
@@ -884,9 +824,10 @@ if ($db->isConnected()) {
             const statusWidget = document.getElementById('serverStatus');
             if (!statusWidget) return;
 
-            const statusDiv = statusWidget.querySelector('.status-loading') || 
-                             statusWidget.querySelector('.status-online') || 
-                             statusWidget.querySelector('.status-offline');
+            const statusTile = statusWidget.querySelector('.tile-value.status-loading');
+            const playerCountElement = document.getElementById('playerCount');
+            const serverVersionElement = document.getElementById('serverVersion');
+            const statusIcon = statusWidget.querySelector('.tile-icon');
 
             try {
                 // Lade Server Status von API
@@ -894,23 +835,49 @@ if ($db->isConnected()) {
                 const data = await response.json();
 
                 if (data.online) {
-                    statusDiv.className = 'status-online';
-                    statusDiv.innerHTML = `
-                        Server Online
-                        <div class="server-stats">
-                            <span class="stat-item">👥 ${data.players.online}/${data.players.max} Spieler</span>
-                            <span class="stat-item">📋 ${data.version}</span>
-                            ${data.ping ? `<span class="stat-item">⚡ ${data.ping}ms</span>` : ''}
-                        </div>
-                    `;
+                    // Server Status Kachel
+                    statusTile.className = 'tile-value status-online';
+                    statusTile.textContent = 'Online';
+                    statusIcon.textContent = '🟢';
+
+                    // Spieler Kachel
+                    if (playerCountElement) {
+                        playerCountElement.textContent = `${data.players.online}/${data.players.max}`;
+                    }
+
+                    // Version Kachel
+                    if (serverVersionElement) {
+                        serverVersionElement.textContent = data.version || '1.20+';
+                    }
                 } else {
-                    statusDiv.className = 'status-offline';
-                    statusDiv.innerHTML = 'Server Offline';
+                    // Server Offline
+                    statusTile.className = 'tile-value status-offline';
+                    statusTile.textContent = 'Offline';
+                    statusIcon.textContent = '🔴';
+
+                    if (playerCountElement) {
+                        playerCountElement.textContent = '0/0';
+                    }
+
+                    if (serverVersionElement) {
+                        serverVersionElement.textContent = '-';
+                    }
                 }
             } catch (error) {
                 console.error('Fehler beim Laden des Server Status:', error);
-                statusDiv.className = 'status-offline';
-                statusDiv.innerHTML = 'Status nicht verfügbar';
+                
+                // Fehler-Status
+                statusTile.className = 'tile-value status-offline';
+                statusTile.textContent = 'Fehler';
+                statusIcon.textContent = '⚠️';
+
+                if (playerCountElement) {
+                    playerCountElement.textContent = '-/-';
+                }
+
+                if (serverVersionElement) {
+                    serverVersionElement.textContent = '-';
+                }
             }
         }
 

@@ -339,14 +339,14 @@ function renderAnnouncements() {
         
         announcementsList.innerHTML = `
             <div class="admin-sort-controls">
-                <label class="admin-label">Sort by:</label>
+                <label class="admin-label">Sortieren nach:</label>
                 <select class="admin-input" style="width: auto; display: inline-block; margin-left: 0.5rem;" onchange="changeSortOrder('announcements', this.value)">
-                    <option value="date-desc" ${adminData.sortOrder.announcements === 'date-desc' ? 'selected' : ''}>Newest First</option>
-                    <option value="date-asc" ${adminData.sortOrder.announcements === 'date-asc' ? 'selected' : ''}>Oldest First</option>
-                    <option value="title-asc" ${adminData.sortOrder.announcements === 'title-asc' ? 'selected' : ''}>Title A-Z</option>
-                    <option value="title-desc" ${adminData.sortOrder.announcements === 'title-desc' ? 'selected' : ''}>Title Z-A</option>
-                    <option value="type-asc" ${adminData.sortOrder.announcements === 'type-asc' ? 'selected' : ''}>Type A-Z</option>
-                    <option value="status" ${adminData.sortOrder.announcements === 'status' ? 'selected' : ''}>Active First</option>
+                    <option value="date-desc" ${adminData.sortOrder.announcements === 'date-desc' ? 'selected' : ''}>Neueste zuerst</option>
+                    <option value="date-asc" ${adminData.sortOrder.announcements === 'date-asc' ? 'selected' : ''}>Älteste zuerst</option>
+                    <option value="title-asc" ${adminData.sortOrder.announcements === 'title-asc' ? 'selected' : ''}>Titel A-Z</option>
+                    <option value="title-desc" ${adminData.sortOrder.announcements === 'title-desc' ? 'selected' : ''}>Titel Z-A</option>
+                    <option value="type-asc" ${adminData.sortOrder.announcements === 'type-asc' ? 'selected' : ''}>Typ A-Z</option>
+                    <option value="status" ${adminData.sortOrder.announcements === 'status' ? 'selected' : ''}>Aktive zuerst</option>
                 </select>
             </div>
             ${sortedAnnouncements.map(announcement => `
@@ -362,7 +362,7 @@ function renderAnnouncements() {
                                     '<span class="admin-badge admin-badge-secondary"><i class="fas fa-eye-slash"></i> Inactive</span>'
                                 }
                                 <span style="font-size: 0.75rem; color: #6b7280; margin-left: 0.5rem;">
-                                    Created: ${formatDate(announcement.created_at || announcement.createdAt)}
+                                    Erstellt: ${formatDate(announcement.created_at || announcement.createdAt)}
                                 </span>
                             </div>
                         </div>
@@ -389,13 +389,13 @@ function renderNews() {
         
         newsList.innerHTML = `
             <div class="admin-sort-controls">
-                <label class="admin-label">Sort by:</label>
+                <label class="admin-label">Sortieren nach:</label>
                 <select class="admin-input" style="width: auto; display: inline-block; margin-left: 0.5rem;" onchange="changeSortOrder('news', this.value)">
-                    <option value="date-desc" ${adminData.sortOrder.news === 'date-desc' ? 'selected' : ''}>Newest First</option>
-                    <option value="date-asc" ${adminData.sortOrder.news === 'date-asc' ? 'selected' : ''}>Oldest First</option>
-                    <option value="title-asc" ${adminData.sortOrder.news === 'title-asc' ? 'selected' : ''}>Title A-Z</option>
-                    <option value="title-desc" ${adminData.sortOrder.news === 'title-desc' ? 'selected' : ''}>Title Z-A</option>
-                    <option value="status" ${adminData.sortOrder.news === 'status' ? 'selected' : ''}>Published First</option>
+                    <option value="date-desc" ${adminData.sortOrder.news === 'date-desc' ? 'selected' : ''}>Neueste zuerst</option>
+                    <option value="date-asc" ${adminData.sortOrder.news === 'date-asc' ? 'selected' : ''}>Älteste zuerst</option>
+                    <option value="title-asc" ${adminData.sortOrder.news === 'title-asc' ? 'selected' : ''}>Titel A-Z</option>
+                    <option value="title-desc" ${adminData.sortOrder.news === 'title-desc' ? 'selected' : ''}>Titel Z-A</option>
+                    <option value="status" ${adminData.sortOrder.news === 'status' ? 'selected' : ''}>Veröffentlichte zuerst</option>
                 </select>
             </div>
             ${sortedNews.map(article => `
@@ -410,7 +410,7 @@ function renderNews() {
                                     '<span class="admin-badge admin-badge-secondary"><i class="fas fa-eye-slash"></i> Draft</span>'
                                 }
                                 <span style="font-size: 0.75rem; color: #6b7280; margin-left: 0.5rem;">
-                                    Created: ${formatDate(article.created_at || article.createdAt)}
+                                    Erstellt: ${formatDate(article.created_at || article.createdAt)}
                                 </span>
                             </div>
                         </div>

@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "Neue PvP Arena eröffnet",
+    "content": "Wir freuen uns, die Eröffnung unserer brandneuen PvP Arena bekannt zu geben. Mit modernster Ausstattung und verschiedenen Kampfmodi bietet sie das ultimative Trainingsvergnügen.",
+    "excerpt": "Brandneue PvP Arena mit modernster Ausstattung jetzt verfügbar.",
+    "published": true,
+    "created_at": "2025-06-03T08:55:07.358Z"
+  },
+  {
+    "id": 2,
+    "title": "Training-Update 2.0",
+    "content": "Das große Training-Update 2.0 ist da! Neue Übungsmodule, verbesserte KI-Gegner und erweiterte Statistiken warten auf euch.",
+    "excerpt": "Umfangreiches Update mit neuen Trainingsfeatures und Verbesserungen.",
+    "published": true,
+    "created_at": "2025-06-03T08:55:07.358Z"
+  },
+  {
+    "id": 3,
+    "title": "Community Event angekündigt",
+    "content": "Unser erstes großes Community-Event findet nächsten Monat statt. Teilnehmer können exklusive Belohnungen und Ränge gewinnen.",
+    "excerpt": "Großes Community-Event mit exklusiven Belohnungen angekündigt.",
+    "published": true,
+    "created_at": "2025-06-03T08:55:07.358Z"
+  }
+]

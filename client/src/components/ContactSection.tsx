@@ -3,9 +3,11 @@ import { Server, Headphones, Copy, HelpCircle } from "lucide-react";
 import { SiDiscord } from "react-icons/si";
 import { Circle, Clock, Globe, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useServerStatus } from "@/hooks/use-server-status";
 
 export default function ContactSection() {
   const { toast } = useToast();
+  const { data: serverStatus, isLoading } = useServerStatus();
 
   const copyServerIP = async () => {
     try {

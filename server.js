@@ -2,6 +2,10 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 
+// MySQL connection (optional)
+let mysqlConnection = null;
+let usingMySQL = false;
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -122,7 +126,69 @@ app.use('/admin', express.static('admin'));
 
 // Root route serves main HTML file
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'knockgames.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// MySQL Setup Routes
+app.get('/admin/mysql-setup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin', 'mysql-setup.html'));
+});
+
+app.post('/api/mysql/test', async (req, res) => {
+  const { host, port, database, user, password } = req.body;
+  
+  try {
+    const mysql = require('mysql2/promise');
+    const connection = await mysql.createConnection({
+      host,
+      port,
+      database,
+      user,
+      password,
+      timeout: 5000
+    });
+    
+    await connection.execute('SELECT 1');
+    await connection.end();
+    
+    res.json({ success: true, message: 'Connection successful' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/api/mysql/configure', async (req, res) => {
+  const { host, port, database, user, password } = req.body;
+  
+  try {
+    const mysql = require('mysql2/promise');
+    mysqlConnection = await mysql.createConnection({
+      host,
+      port,
+      database,
+      user,
+      password
+    });
+    
+    // Test the connection
+    await mysqlConnection.execute('SELECT 1');
+    usingMySQL = true;
+    
+    // Save configuration for future restarts
+    const config = { host, port, database, user, password };
+    await fs.writeFile('./mysql-config.json', JSON.stringify(config, null, 2));
+    
+    res.json({ success: true, message: 'MySQL configured successfully' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get('/api/mysql/status', (req, res) => {
+  res.json({ 
+    connected: usingMySQL,
+    database: usingMySQL ? 'MySQL' : 'JSON Files'
+  });
 });
 
 // Public API endpoints

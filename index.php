@@ -142,20 +142,54 @@ if ($db->isConnected()) {
 
         .cta-button {
             display: inline-block;
-            background: linear-gradient(45deg, #ff9124, #ff7700);
-            color: #000;
+            background: linear-gradient(135deg, #ff9124 0%, #e67e0e 100%);
+            color: #fff;
             padding: 1rem 2rem;
             text-decoration: none;
+            border: none;
             border-radius: 50px;
             font-weight: bold;
             font-size: 1.1rem;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(255, 145, 36, 0.3);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
         }
 
         .cta-button:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(255, 145, 36, 0.5);
+        }
+
+        .cta-button:active {
+            transform: translateY(-1px);
+        }
+
+        .copy-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            animation: copy-feedback 0.3s ease;
+        }
+
+        @keyframes copy-feedback {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         .section {
@@ -379,6 +413,89 @@ if ($db->isConnected()) {
             }
         }
 
+        /* Server Status Kacheln */
+        .server-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .status-tile {
+            background: linear-gradient(135deg, rgba(255, 145, 36, 0.15) 0%, rgba(255, 145, 36, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 1.5rem 1rem;
+            border: 2px solid rgba(255, 145, 36, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(255, 145, 36, 0.1);
+        }
+
+        .status-tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 145, 36, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .status-tile:hover::before {
+            left: 100%;
+        }
+
+        .status-tile:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 145, 36, 0.2);
+            border-color: rgba(255, 145, 36, 0.5);
+        }
+
+        .tile-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 0 10px rgba(255, 145, 36, 0.5));
+        }
+
+        .tile-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .tile-label {
+            color: #ff9124;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tile-value {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .status-online {
+            color: #28a745;
+        }
+
+        .status-offline {
+            color: #dc3545;
+        }
+
+        .status-loading {
+            color: #ffc107;
+        }
+
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2.5rem;
@@ -421,7 +538,7 @@ if ($db->isConnected()) {
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="/" class="logo">KnockGames.eu</a>
+                <a href="/index.php" class="logo">KnockGames.eu</a>
                 <nav>
                     <ul>
                         <li><a href="#home">Home</a></li>
@@ -440,7 +557,33 @@ if ($db->isConnected()) {
                 <h1>KnockGames.eu</h1>
                 <p>Das ultimative Minecraft Training Network</p>
                 <p>Verbessere deine PvP-Fähigkeiten mit professionellen Trainingsmodulen</p>
-                <a href="#training" class="cta-button">Jetzt trainieren</a>
+                
+                <!-- Server Status Kacheln -->
+                <div class="server-status-grid" id="serverStatus">
+                    <div class="status-tile">
+                        <div class="tile-icon">🟢</div>
+                        <div class="tile-content">
+                            <div class="tile-label">Server Status</div>
+                            <div class="tile-value status-loading">Lädt...</div>
+                        </div>
+                    </div>
+                    <div class="status-tile">
+                        <div class="tile-icon">👥</div>
+                        <div class="tile-content">
+                            <div class="tile-label">Spieler Online</div>
+                            <div class="tile-value" id="playerCount">-/-</div>
+                        </div>
+                    </div>
+                    <div class="status-tile">
+                        <div class="tile-icon">📋</div>
+                        <div class="tile-content">
+                            <div class="tile-label">Server Version</div>
+                            <div class="tile-value" id="serverVersion">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="cta-button" onclick="copyServerIP()">Server IP Kopieren</button>
             </section>
 
             <?php if (!empty($announcements)): ?>
@@ -527,7 +670,7 @@ if ($db->isConnected()) {
         </div>
     </footer>
 
-    <a href="/admin" class="admin-link">Admin</a>
+    <a href="/admin/index.php" class="admin-link">Admin</a>
 
     <!-- Modal für Ankündigungen und News -->
     <div id="contentModal" class="modal">
@@ -668,7 +811,114 @@ if ($db->isConnected()) {
                     e.stopPropagation();
                 }
             });
+
+            // Server Status laden
+            loadServerStatus();
+            
+            // Server Status alle 30 Sekunden aktualisieren
+            setInterval(loadServerStatus, 30000);
         });
+
+        // Server Status Abfrage
+        async function loadServerStatus() {
+            const statusWidget = document.getElementById('serverStatus');
+            if (!statusWidget) return;
+
+            const statusTile = statusWidget.querySelector('.tile-value.status-loading');
+            const playerCountElement = document.getElementById('playerCount');
+            const serverVersionElement = document.getElementById('serverVersion');
+            const statusIcon = statusWidget.querySelector('.tile-icon');
+
+            try {
+                // Lade Server Status von API
+                const response = await fetch('/api/minecraft/status?host=knockgames.eu');
+                const data = await response.json();
+
+                if (data.online) {
+                    // Server Status Kachel
+                    statusTile.className = 'tile-value status-online';
+                    statusTile.textContent = 'Online';
+                    statusIcon.textContent = '🟢';
+
+                    // Spieler Kachel
+                    if (playerCountElement) {
+                        playerCountElement.textContent = `${data.players.online}/${data.players.max}`;
+                    }
+
+                    // Version Kachel
+                    if (serverVersionElement) {
+                        serverVersionElement.textContent = data.version || '1.20+';
+                    }
+                } else {
+                    // Server Offline
+                    statusTile.className = 'tile-value status-offline';
+                    statusTile.textContent = 'Offline';
+                    statusIcon.textContent = '🔴';
+
+                    if (playerCountElement) {
+                        playerCountElement.textContent = '0/0';
+                    }
+
+                    if (serverVersionElement) {
+                        serverVersionElement.textContent = '-';
+                    }
+                }
+            } catch (error) {
+                console.error('Fehler beim Laden des Server Status:', error);
+                
+                // Fehler-Status
+                statusTile.className = 'tile-value status-offline';
+                statusTile.textContent = 'Fehler';
+                statusIcon.textContent = '⚠️';
+
+                if (playerCountElement) {
+                    playerCountElement.textContent = '-/-';
+                }
+
+                if (serverVersionElement) {
+                    serverVersionElement.textContent = '-';
+                }
+            }
+        }
+
+        // Server IP kopieren Funktionalität
+        async function copyServerIP() {
+            const serverIP = 'knockgames.eu';
+            const button = event.target;
+            const originalText = button.textContent;
+
+            try {
+                await navigator.clipboard.writeText(serverIP);
+                
+                // Erfolgsfeedback
+                button.classList.add('copy-success');
+                button.textContent = '✓ IP Kopiert!';
+                
+                // Button nach 2 Sekunden zurücksetzen
+                setTimeout(() => {
+                    button.classList.remove('copy-success');
+                    button.textContent = originalText;
+                }, 2000);
+                
+            } catch (err) {
+                // Fallback für ältere Browser
+                const textArea = document.createElement('textarea');
+                textArea.value = serverIP;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Erfolgsfeedback
+                button.classList.add('copy-success');
+                button.textContent = '✓ IP Kopiert!';
+                
+                setTimeout(() => {
+                    button.classList.remove('copy-success');
+                    button.textContent = originalText;
+                }, 2000);
+            }
+        }
     </script>
 </body>
 </html>

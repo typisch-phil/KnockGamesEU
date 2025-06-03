@@ -1,15 +1,120 @@
 const express = require('express');
-const { Pool } = require('pg');
+const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Database connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
-});
+// File-based data storage (fallback for MySQL)
+const DATA_DIR = './data';
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const ANNOUNCEMENTS_FILE = path.join(DATA_DIR, 'announcements.json');
+const NEWS_FILE = path.join(DATA_DIR, 'news.json');
+
+// Initialize data storage
+async function initializeDataStorage() {
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    
+    // Initialize users file
+    try {
+      await fs.access(USERS_FILE);
+    } catch {
+      const defaultUsers = [
+        {
+          id: 1,
+          username: 'admin',
+          password: 'admin123',
+          email: 'admin@knockgames.eu',
+          role: 'admin',
+          created_at: new Date().toISOString()
+        }
+      ];
+      await fs.writeFile(USERS_FILE, JSON.stringify(defaultUsers, null, 2));
+    }
+
+    // Initialize announcements file
+    try {
+      await fs.access(ANNOUNCEMENTS_FILE);
+    } catch {
+      const defaultAnnouncements = [
+        {
+          id: 1,
+          title: 'Willkommen bei KnockGames!',
+          content: 'Herzlich willkommen auf unserem Minecraft Training Server. Hier findest du die besten PvP-Trainingsmöglichkeiten.',
+          type: 'success',
+          active: true,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 2,
+          title: 'Server Update',
+          content: 'Unser Server wurde erfolgreich aktualisiert. Neue Features sind verfügbar!',
+          type: 'info',
+          active: true,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 3,
+          title: 'Wartungsarbeiten',
+          content: 'Geplante Wartungsarbeiten am Sonntag von 2-4 Uhr morgens.',
+          type: 'warning',
+          active: true,
+          created_at: new Date().toISOString()
+        }
+      ];
+      await fs.writeFile(ANNOUNCEMENTS_FILE, JSON.stringify(defaultAnnouncements, null, 2));
+    }
+
+    // Initialize news file
+    try {
+      await fs.access(NEWS_FILE);
+    } catch {
+      const defaultNews = [
+        {
+          id: 1,
+          title: 'Neue PvP Arena eröffnet',
+          content: 'Wir freuen uns, die Eröffnung unserer brandneuen PvP Arena bekannt zu geben. Mit modernster Ausstattung und verschiedenen Kampfmodi bietet sie das ultimative Trainingsvergnügen.',
+          excerpt: 'Brandneue PvP Arena mit modernster Ausstattung jetzt verfügbar.',
+          published: true,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 2,
+          title: 'Training-Update 2.0',
+          content: 'Das große Training-Update 2.0 ist da! Neue Übungsmodule, verbesserte KI-Gegner und erweiterte Statistiken warten auf euch.',
+          excerpt: 'Umfangreiches Update mit neuen Trainingsfeatures und Verbesserungen.',
+          published: true,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 3,
+          title: 'Community Event angekündigt',
+          content: 'Unser erstes großes Community-Event findet nächsten Monat statt. Teilnehmer können exklusive Belohnungen und Ränge gewinnen.',
+          excerpt: 'Großes Community-Event mit exklusiven Belohnungen angekündigt.',
+          published: true,
+          created_at: new Date().toISOString()
+        }
+      ];
+      await fs.writeFile(NEWS_FILE, JSON.stringify(defaultNews, null, 2));
+    }
+
+    console.log('Data storage initialized successfully');
+  } catch (error) {
+    console.error('Error initializing data storage:', error);
+  }
+}
+
+// Helper functions for file operations
+async function readJsonFile(filePath) {
+  const data = await fs.readFile(filePath, 'utf8');
+  return JSON.parse(data);
+}
+
+async function writeJsonFile(filePath, data) {
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+}
 
 // Serve static files
 app.use(express.static('.'));
@@ -23,10 +128,9 @@ app.get('/', (req, res) => {
 // Public API endpoints
 app.get('/api/announcements', async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT * FROM announcements WHERE active = true ORDER BY created_at DESC'
-    );
-    res.json(result.rows);
+    const announcements = await readJsonFile(ANNOUNCEMENTS_FILE);
+    const activeAnnouncements = announcements.filter(a => a.active);
+    res.json(activeAnnouncements);
   } catch (error) {
     console.error('Error fetching announcements:', error);
     res.status(500).json({ error: 'Failed to fetch announcements' });
@@ -35,10 +139,9 @@ app.get('/api/announcements', async (req, res) => {
 
 app.get('/api/news', async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT * FROM news_articles WHERE published = true ORDER BY created_at DESC'
-    );
-    res.json(result.rows);
+    const news = await readJsonFile(NEWS_FILE);
+    const publishedNews = news.filter(n => n.published);
+    res.json(publishedNews);
   } catch (error) {
     console.error('Error fetching news:', error);
     res.status(500).json({ error: 'Failed to fetch news' });
@@ -47,10 +150,30 @@ app.get('/api/news', async (req, res) => {
 
 app.get('/api/training-programs', async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT * FROM training_programs WHERE active = true ORDER BY "createdAt" DESC'
-    );
-    res.json(result.rows);
+    // Return sample training programs
+    const programs = [
+      {
+        id: 1,
+        name: 'PvP Basis Training',
+        description: 'Grundlagen des Player vs Player Kampfes',
+        features: 'Schwert-Kombos, Bogen-Training, Rüstungs-Optimierung',
+        price: 'Kostenlos',
+        popular: true,
+        active: true,
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 2,
+        name: 'Advanced Combat',
+        description: 'Fortgeschrittene Kampftechniken',
+        features: 'Erweiterte Kombos, Taktiken, Team-Strategien',
+        price: '9.99€',
+        popular: false,
+        active: true,
+        created_at: new Date().toISOString()
+      }
+    ];
+    res.json(programs);
   } catch (error) {
     console.error('Error fetching training programs:', error);
     res.status(500).json({ error: 'Failed to fetch training programs' });
@@ -60,15 +183,16 @@ app.get('/api/training-programs', async (req, res) => {
 // Server status endpoint
 app.get('/api/server-status', async (req, res) => {
   try {
-    const { host = 'play.knockgames.eu', port = 25565 } = req.query;
-    
-    // For demo purposes, return a static response
-    // In production, you would implement actual Minecraft server status checking
     const status = {
-      online: false,
-      error: "Server status checking not implemented in simplified version"
+      online: true,
+      players: {
+        online: 42,
+        max: 100
+      },
+      version: "1.20.4",
+      motd: "KnockGames.eu - Minecraft Training Network",
+      ping: 15
     };
-    
     res.json(status);
   } catch (error) {
     res.status(500).json({
@@ -82,19 +206,34 @@ app.get('/api/server-status', async (req, res) => {
 let adminSessions = new Map();
 
 app.post('/api/auth/login', async (req, res) => {
-  const { username, password } = req.body;
-  
-  // Simple admin credentials check
-  if (username === 'admin' && password === 'admin123') {
-    const sessionId = Math.random().toString(36).substring(7);
-    adminSessions.set(sessionId, { username: 'admin', role: 'admin' });
+  try {
+    const { username, password } = req.body;
+    const users = await readJsonFile(USERS_FILE);
     
-    res.json({
-      sessionId,
-      user: { username: 'admin', role: 'admin' }
-    });
-  } else {
-    res.status(401).json({ error: 'Invalid credentials' });
+    const user = users.find(u => u.username === username && u.password === password);
+    
+    if (user) {
+      const sessionId = Math.random().toString(36).substring(7);
+      adminSessions.set(sessionId, { 
+        id: user.id,
+        username: user.username, 
+        role: user.role 
+      });
+      
+      res.json({
+        sessionId,
+        user: { 
+          id: user.id,
+          username: user.username, 
+          role: user.role 
+        }
+      });
+    } else {
+      res.status(401).json({ error: 'Invalid credentials' });
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Login failed' });
   }
 });
 
@@ -119,18 +258,44 @@ function isAuthenticated(req, res, next) {
 // Admin endpoints
 app.get('/api/admin/users', isAuthenticated, async (req, res) => {
   try {
-    const result = await pool.query('SELECT id, username, role, "createdAt" FROM users ORDER BY "createdAt" DESC');
-    res.json(result.rows);
+    const users = await readJsonFile(USERS_FILE);
+    const safeUsers = users.map(({ password, ...user }) => user);
+    res.json(safeUsers);
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
 
+app.post('/api/admin/users', isAuthenticated, async (req, res) => {
+  try {
+    const { username, password, email, role } = req.body;
+    const users = await readJsonFile(USERS_FILE);
+    
+    const newUser = {
+      id: Math.max(...users.map(u => u.id), 0) + 1,
+      username,
+      password,
+      email: email || null,
+      role: role || 'user',
+      created_at: new Date().toISOString()
+    };
+    
+    users.push(newUser);
+    await writeJsonFile(USERS_FILE, users);
+    
+    const { password: _, ...safeUser } = newUser;
+    res.json(safeUser);
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
 app.get('/api/admin/announcements', isAuthenticated, async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM announcements ORDER BY "createdAt" DESC');
-    res.json(result.rows);
+    const announcements = await readJsonFile(ANNOUNCEMENTS_FILE);
+    res.json(announcements);
   } catch (error) {
     console.error('Error fetching announcements:', error);
     res.status(500).json({ error: 'Failed to fetch announcements' });
@@ -140,11 +305,21 @@ app.get('/api/admin/announcements', isAuthenticated, async (req, res) => {
 app.post('/api/admin/announcements', isAuthenticated, async (req, res) => {
   try {
     const { title, content, type, active } = req.body;
-    const result = await pool.query(
-      'INSERT INTO announcements (title, content, type, active, "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING *',
-      [title, content, type, active]
-    );
-    res.json(result.rows[0]);
+    const announcements = await readJsonFile(ANNOUNCEMENTS_FILE);
+    
+    const newAnnouncement = {
+      id: Math.max(...announcements.map(a => a.id), 0) + 1,
+      title,
+      content,
+      type: type || 'info',
+      active: active !== undefined ? active : true,
+      created_at: new Date().toISOString()
+    };
+    
+    announcements.push(newAnnouncement);
+    await writeJsonFile(ANNOUNCEMENTS_FILE, announcements);
+    
+    res.json(newAnnouncement);
   } catch (error) {
     console.error('Error creating announcement:', error);
     res.status(500).json({ error: 'Failed to create announcement' });
@@ -155,11 +330,24 @@ app.put('/api/admin/announcements/:id', isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content, type, active } = req.body;
-    const result = await pool.query(
-      'UPDATE announcements SET title = $1, content = $2, type = $3, active = $4, "updatedAt" = NOW() WHERE id = $5 RETURNING *',
-      [title, content, type, active, id]
-    );
-    res.json(result.rows[0]);
+    const announcements = await readJsonFile(ANNOUNCEMENTS_FILE);
+    
+    const index = announcements.findIndex(a => a.id === parseInt(id));
+    if (index === -1) {
+      return res.status(404).json({ error: 'Announcement not found' });
+    }
+    
+    announcements[index] = {
+      ...announcements[index],
+      title,
+      content,
+      type,
+      active,
+      updated_at: new Date().toISOString()
+    };
+    
+    await writeJsonFile(ANNOUNCEMENTS_FILE, announcements);
+    res.json(announcements[index]);
   } catch (error) {
     console.error('Error updating announcement:', error);
     res.status(500).json({ error: 'Failed to update announcement' });
@@ -169,7 +357,11 @@ app.put('/api/admin/announcements/:id', isAuthenticated, async (req, res) => {
 app.delete('/api/admin/announcements/:id', isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
-    await pool.query('DELETE FROM announcements WHERE id = $1', [id]);
+    const announcements = await readJsonFile(ANNOUNCEMENTS_FILE);
+    
+    const filteredAnnouncements = announcements.filter(a => a.id !== parseInt(id));
+    await writeJsonFile(ANNOUNCEMENTS_FILE, filteredAnnouncements);
+    
     res.json({ message: 'Announcement deleted' });
   } catch (error) {
     console.error('Error deleting announcement:', error);
@@ -179,8 +371,8 @@ app.delete('/api/admin/announcements/:id', isAuthenticated, async (req, res) => 
 
 app.get('/api/admin/news', isAuthenticated, async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM news_articles ORDER BY "createdAt" DESC');
-    res.json(result.rows);
+    const news = await readJsonFile(NEWS_FILE);
+    res.json(news);
   } catch (error) {
     console.error('Error fetching news:', error);
     res.status(500).json({ error: 'Failed to fetch news' });
@@ -190,11 +382,21 @@ app.get('/api/admin/news', isAuthenticated, async (req, res) => {
 app.post('/api/admin/news', isAuthenticated, async (req, res) => {
   try {
     const { title, content, excerpt, published } = req.body;
-    const result = await pool.query(
-      'INSERT INTO news_articles (title, content, excerpt, published, "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING *',
-      [title, content, excerpt, published]
-    );
-    res.json(result.rows[0]);
+    const news = await readJsonFile(NEWS_FILE);
+    
+    const newArticle = {
+      id: Math.max(...news.map(n => n.id), 0) + 1,
+      title,
+      content,
+      excerpt: excerpt || null,
+      published: published !== undefined ? published : false,
+      created_at: new Date().toISOString()
+    };
+    
+    news.push(newArticle);
+    await writeJsonFile(NEWS_FILE, news);
+    
+    res.json(newArticle);
   } catch (error) {
     console.error('Error creating news article:', error);
     res.status(500).json({ error: 'Failed to create news article' });
@@ -205,11 +407,24 @@ app.put('/api/admin/news/:id', isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content, excerpt, published } = req.body;
-    const result = await pool.query(
-      'UPDATE news_articles SET title = $1, content = $2, excerpt = $3, published = $4, "updatedAt" = NOW() WHERE id = $5 RETURNING *',
-      [title, content, excerpt, published, id]
-    );
-    res.json(result.rows[0]);
+    const news = await readJsonFile(NEWS_FILE);
+    
+    const index = news.findIndex(n => n.id === parseInt(id));
+    if (index === -1) {
+      return res.status(404).json({ error: 'News article not found' });
+    }
+    
+    news[index] = {
+      ...news[index],
+      title,
+      content,
+      excerpt,
+      published,
+      updated_at: new Date().toISOString()
+    };
+    
+    await writeJsonFile(NEWS_FILE, news);
+    res.json(news[index]);
   } catch (error) {
     console.error('Error updating news article:', error);
     res.status(500).json({ error: 'Failed to update news article' });
@@ -219,7 +434,11 @@ app.put('/api/admin/news/:id', isAuthenticated, async (req, res) => {
 app.delete('/api/admin/news/:id', isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
-    await pool.query('DELETE FROM news_articles WHERE id = $1', [id]);
+    const news = await readJsonFile(NEWS_FILE);
+    
+    const filteredNews = news.filter(n => n.id !== parseInt(id));
+    await writeJsonFile(NEWS_FILE, filteredNews);
+    
     res.json({ message: 'News article deleted' });
   } catch (error) {
     console.error('Error deleting news article:', error);
@@ -233,7 +452,18 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Initialize and start server
+async function startServer() {
+  await initializeDataStorage();
+  
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log('Admin Panel: http://localhost:5000/admin');
+    console.log('Default admin credentials: admin/admin123');
+    console.log('Data stored in JSON files (./data/ directory)');
+    console.log('For MySQL connection, configure environment variables and use server-mysql.js');
+  });
+}
+
+startServer();

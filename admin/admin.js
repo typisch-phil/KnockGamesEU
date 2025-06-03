@@ -1,7 +1,6 @@
-// Admin Panel State
+// Admin Panel State - Lokale Version ohne Node.js Backend
 let adminData = {
     isLoggedIn: false,
-    sessionId: null,
     currentUser: null,
     users: [],
     announcements: [],
@@ -16,6 +15,12 @@ let adminData = {
     }
 };
 
+// Standard Admin Login Daten
+const ADMIN_CREDENTIALS = {
+    username: 'admin',
+    password: 'admin123'
+};
+
 // Initialize Admin Panel when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeAdminPanel();
@@ -23,10 +28,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize Admin Panel
 function initializeAdminPanel() {
+    // Lade Daten aus localStorage
+    loadLocalData();
+    
+    // Prüfe ob bereits eingeloggt
+    const savedSession = localStorage.getItem('adminLoggedIn');
+    if (savedSession === 'true') {
+        adminData.isLoggedIn = true;
+        adminData.currentUser = { username: 'admin', role: 'admin' };
+        hideAdminLogin();
+        showAdminDashboard();
+        loadAdminData();
+    }
+
     // Admin Login Form
     const loginForm = document.getElementById('admin-login-form');
     if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
+        loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const username = document.getElementById('admin-username').value;
             const password = document.getElementById('admin-password').value;
@@ -34,425 +52,388 @@ function initializeAdminPanel() {
             const errorDiv = document.getElementById('admin-login-error');
             const errorText = document.getElementById('admin-login-error-text');
 
-            loginBtn.textContent = 'Logging in...';
+            loginBtn.textContent = 'Anmelden...';
             loginBtn.disabled = true;
             errorDiv.classList.add('hidden');
 
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'Login failed');
-                }
-
+            // Lokale Authentifizierung
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
                 adminData.isLoggedIn = true;
-                adminData.sessionId = data.sessionId;
-                adminData.currentUser = data.user;
-                localStorage.setItem('adminSessionId', data.sessionId);
+                adminData.currentUser = { username: 'admin', role: 'admin' };
+                localStorage.setItem('adminLoggedIn', 'true');
 
-                document.getElementById('admin-username-display').textContent = data.user.username;
+                document.getElementById('admin-username-display').textContent = username;
                 
                 hideAdminLogin();
                 showAdminDashboard();
-                
-            } catch (error) {
-                errorText.textContent = error.message;
+                loadAdminData();
+            } else {
+                errorText.textContent = 'Ungültige Anmeldedaten';
                 errorDiv.classList.remove('hidden');
-            } finally {
-                loginBtn.textContent = 'Login';
-                loginBtn.disabled = false;
             }
+
+            loginBtn.textContent = 'Anmelden';
+            loginBtn.disabled = false;
         });
     }
 
     // Announcement Form
     const announcementForm = document.getElementById('announcement-form');
     if (announcementForm) {
-        announcementForm.addEventListener('submit', async (e) => {
+        announcementForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
             const formData = {
+                id: adminData.editingAnnouncement ? adminData.editingAnnouncement.id : Date.now(),
                 title: document.getElementById('announcement-title').value,
                 content: document.getElementById('announcement-content').value,
                 type: document.getElementById('announcement-type').value,
-                active: document.getElementById('announcement-active').checked
+                active: document.getElementById('announcement-active').checked,
+                created_at: adminData.editingAnnouncement ? adminData.editingAnnouncement.created_at : new Date().toISOString()
             };
 
-            try {
-                if (adminData.editingAnnouncement) {
-                    await apiRequest(`/api/admin/announcements/${adminData.editingAnnouncement.id}`, {
-                        method: 'PUT',
-                        body: JSON.stringify(formData)
-                    });
-                } else {
-                    await apiRequest('/api/admin/announcements', {
-                        method: 'POST',
-                        body: JSON.stringify(formData)
-                    });
+            if (adminData.editingAnnouncement) {
+                // Update existing announcement
+                const index = adminData.announcements.findIndex(a => a.id === adminData.editingAnnouncement.id);
+                if (index !== -1) {
+                    adminData.announcements[index] = formData;
                 }
-
-                announcementForm.reset();
-                document.getElementById('announcement-active').checked = true;
-                cancelAnnouncementEdit();
-                loadAdminData();
-            } catch (error) {
-                alert('Error: ' + error.message);
+            } else {
+                // Add new announcement
+                adminData.announcements.push(formData);
             }
-        });
-    }
 
-    // User Form
-    const userForm = document.getElementById('user-form');
-    if (userForm) {
-        userForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = {
-                username: document.getElementById('user-username').value,
-                password: document.getElementById('user-password').value,
-                email: document.getElementById('user-email').value,
-                role: document.getElementById('user-role').value
-            };
-
-            try {
-                if (adminData.editingUser) {
-                    await apiRequest(`/api/admin/users/${adminData.editingUser.id}`, {
-                        method: 'PUT',
-                        body: JSON.stringify(formData)
-                    });
-                } else {
-                    await apiRequest('/api/admin/users', {
-                        method: 'POST',
-                        body: JSON.stringify(formData)
-                    });
-                }
-
-                userForm.reset();
-                cancelUserEdit();
-                loadAdminData();
-                alert('User saved successfully!');
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
+            saveLocalData();
+            cancelAnnouncementEdit();
+            loadAdminData();
         });
     }
 
     // News Form
     const newsForm = document.getElementById('news-form');
     if (newsForm) {
-        newsForm.addEventListener('submit', async (e) => {
+        newsForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
             const formData = {
+                id: adminData.editingNews ? adminData.editingNews.id : Date.now(),
                 title: document.getElementById('news-title').value,
-                excerpt: document.getElementById('news-excerpt').value,
                 content: document.getElementById('news-content').value,
-                published: document.getElementById('news-published').checked
+                author: document.getElementById('news-author').value,
+                published: document.getElementById('news-published').checked,
+                created_at: adminData.editingNews ? adminData.editingNews.created_at : new Date().toISOString()
             };
 
-            try {
-                if (adminData.editingNews) {
-                    await apiRequest(`/api/admin/news/${adminData.editingNews.id}`, {
-                        method: 'PUT',
-                        body: JSON.stringify(formData)
-                    });
-                } else {
-                    await apiRequest('/api/admin/news', {
-                        method: 'POST',
-                        body: JSON.stringify(formData)
-                    });
+            if (adminData.editingNews) {
+                // Update existing news
+                const index = adminData.news.findIndex(n => n.id === adminData.editingNews.id);
+                if (index !== -1) {
+                    adminData.news[index] = formData;
                 }
-
-                newsForm.reset();
-                cancelNewsEdit();
-                loadAdminData();
-            } catch (error) {
-                alert('Error: ' + error.message);
+            } else {
+                // Add new news
+                adminData.news.push(formData);
             }
+
+            saveLocalData();
+            cancelNewsEdit();
+            loadAdminData();
         });
     }
 
-    // Check for existing session
-    const savedSessionId = localStorage.getItem('adminSessionId');
-    if (savedSessionId) {
-        adminData.sessionId = savedSessionId;
-        apiRequest('/api/auth/me').then(user => {
-            adminData.isLoggedIn = true;
-            adminData.currentUser = user;
-            document.getElementById('admin-username-display').textContent = user.username;
-            hideAdminLogin();
-            showAdminDashboard();
-        }).catch(() => {
-            localStorage.removeItem('adminSessionId');
-            adminData.sessionId = null;
+    // User Form
+    const userForm = document.getElementById('user-form');
+    if (userForm) {
+        userForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('user-username').value;
+            const email = document.getElementById('user-email').value;
+            const role = document.getElementById('user-role').value;
+            
+            // Prüfe auf doppelte Benutzernamen
+            if (!adminData.editingUser && adminData.users.some(u => u.username === username)) {
+                alert('Benutzername bereits vorhanden!');
+                return;
+            }
+
+            const formData = {
+                id: adminData.editingUser ? adminData.editingUser.id : Date.now(),
+                username: username,
+                email: email,
+                role: role,
+                created_at: adminData.editingUser ? adminData.editingUser.created_at : new Date().toISOString()
+            };
+
+            if (adminData.editingUser) {
+                // Update existing user
+                const index = adminData.users.findIndex(u => u.id === adminData.editingUser.id);
+                if (index !== -1) {
+                    adminData.users[index] = formData;
+                }
+            } else {
+                // Add new user
+                adminData.users.push(formData);
+            }
+
+            saveLocalData();
+            cancelUserEdit();
+            loadAdminData();
         });
     }
+
+    // Tab Navigation
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.getAttribute('data-tab');
+            showAdminTab(tabName);
+        });
+    });
+
+    // Logout Button
+    const logoutBtn = document.getElementById('admin-logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', adminLogout);
+    }
+
+    // Sortierung Event Listeners
+    const sortSelects = document.querySelectorAll('.sort-select');
+    sortSelects.forEach(select => {
+        select.addEventListener('change', (e) => {
+            const type = e.target.getAttribute('data-type');
+            const order = e.target.value;
+            changeSortOrder(type, order);
+        });
+    });
 }
 
-// Admin Panel Functions
 function hideAdminLogin() {
-    document.getElementById('admin-login').classList.add('hidden');
+    const loginSection = document.getElementById('admin-login');
+    if (loginSection) {
+        loginSection.style.display = 'none';
+    }
 }
 
 function showAdminDashboard() {
-    document.getElementById('admin-dashboard').classList.remove('hidden');
-    loadAdminData();
+    const dashboardSection = document.getElementById('admin-dashboard');
+    if (dashboardSection) {
+        dashboardSection.style.display = 'block';
+    }
 }
 
 function hideAdminDashboard() {
-    document.getElementById('admin-dashboard').classList.add('hidden');
+    const dashboardSection = document.getElementById('admin-dashboard');
+    if (dashboardSection) {
+        dashboardSection.style.display = 'none';
+    }
 }
 
 function showAdminTab(tabName) {
-    document.querySelectorAll('.tab-trigger').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-
-    event.target.classList.add('active');
-    document.getElementById(`tab-${tabName}`).classList.add('active');
-}
-
-// API Helper Functions
-async function apiRequest(url, options = {}) {
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers
-    };
-
-    if (adminData.sessionId) {
-        headers.Authorization = `Bearer ${adminData.sessionId}`;
+    // Hide all tabs
+    const tabs = document.querySelectorAll('.admin-tab');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Remove active class from all tab buttons
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    
+    // Show selected tab
+    const selectedTab = document.getElementById(tabName + '-tab');
+    if (selectedTab) {
+        selectedTab.classList.add('active');
     }
-
-    try {
-        const response = await fetch(url, {
-            ...options,
-            headers
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Request failed');
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error('API Request failed:', error);
-        throw error;
+    
+    // Add active class to selected tab button
+    const selectedButton = document.querySelector(`[data-tab="${tabName}"]`);
+    if (selectedButton) {
+        selectedButton.classList.add('active');
     }
 }
 
 function adminLogout() {
     adminData.isLoggedIn = false;
-    adminData.sessionId = null;
     adminData.currentUser = null;
-    localStorage.removeItem('adminSessionId');
-    hideAdminDashboard();
+    localStorage.removeItem('adminLoggedIn');
     
-    document.getElementById('admin-login-form').reset();
-    document.getElementById('admin-login-error').classList.add('hidden');
-    document.getElementById('admin-login').classList.remove('hidden');
+    hideAdminDashboard();
+    const loginSection = document.getElementById('admin-login');
+    if (loginSection) {
+        loginSection.style.display = 'block';
+    }
+    
+    // Reset forms
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => form.reset());
 }
 
-async function loadAdminData() {
-    try {
-        // Load users, announcements, and news (training programs endpoint doesn't exist in backend)
-        const [users, announcements, news] = await Promise.all([
-            apiRequest('/api/admin/users'),
-            apiRequest('/api/admin/announcements'),
-            apiRequest('/api/admin/news')
-        ]);
+function loadLocalData() {
+    // Lade gespeicherte Daten aus localStorage
+    const savedUsers = localStorage.getItem('knockgames_users');
+    const savedAnnouncements = localStorage.getItem('knockgames_announcements');
+    const savedNews = localStorage.getItem('knockgames_news');
 
-        adminData.users = users;
-        adminData.announcements = announcements;
-        adminData.news = news;
-        adminData.trainingPrograms = []; // Will be populated separately if needed
+    if (savedUsers) {
+        adminData.users = JSON.parse(savedUsers);
+    } else {
+        // Initialdaten wenn keine vorhanden
+        adminData.users = [
+            {
+                id: 1,
+                username: 'TestUser1',
+                email: 'test1@example.com',
+                role: 'Spieler',
+                created_at: new Date().toISOString()
+            },
+            {
+                id: 2,
+                username: 'TestUser2',
+                email: 'test2@example.com',
+                role: 'Moderator',
+                created_at: new Date().toISOString()
+            }
+        ];
+    }
 
-        updateDashboardStats();
-        renderUsers();
-        renderAnnouncements();
-        renderNews();
-        renderTrainingPrograms();
-    } catch (error) {
-        console.error('Failed to load admin data:', error);
+    if (savedAnnouncements) {
+        adminData.announcements = JSON.parse(savedAnnouncements);
+    } else {
+        adminData.announcements = [
+            {
+                id: 1,
+                title: 'Willkommen bei KnockGames!',
+                content: 'Herzlich willkommen auf unserem neuen Training Server!',
+                type: 'info',
+                active: true,
+                created_at: new Date().toISOString()
+            }
+        ];
+    }
+
+    if (savedNews) {
+        adminData.news = JSON.parse(savedNews);
+    } else {
+        adminData.news = [
+            {
+                id: 1,
+                title: 'Server Launch',
+                content: 'Unser neuer Training Server ist jetzt live!',
+                author: 'Admin',
+                published: true,
+                created_at: new Date().toISOString()
+            }
+        ];
     }
 }
 
+function saveLocalData() {
+    localStorage.setItem('knockgames_users', JSON.stringify(adminData.users));
+    localStorage.setItem('knockgames_announcements', JSON.stringify(adminData.announcements));
+    localStorage.setItem('knockgames_news', JSON.stringify(adminData.news));
+}
+
+async function loadAdminData() {
+    updateDashboardStats();
+    renderUsers();
+    renderAnnouncements();
+    renderNews();
+}
+
 function updateDashboardStats() {
-    document.getElementById('total-users').textContent = adminData.users.length;
-    document.getElementById('total-announcements').textContent = adminData.announcements.length;
-    document.getElementById('active-announcements').textContent = 
-        `${adminData.announcements.filter(a => a.active).length} aktiv`;
-    document.getElementById('total-news').textContent = adminData.news.length;
-    document.getElementById('published-news').textContent = 
-        `${adminData.news.filter(n => n.published).length} veröffentlicht`;
-    document.getElementById('total-training').textContent = adminData.trainingPrograms.length;
-    document.getElementById('active-training').textContent = 
-        `${adminData.trainingPrograms.filter(t => t.active).length} aktiv`;
+    const statsElements = {
+        'total-users': adminData.users.length,
+        'total-announcements': adminData.announcements.length,
+        'total-news': adminData.news.length,
+        'active-announcements': adminData.announcements.filter(a => a.active).length
+    };
+
+    Object.entries(statsElements).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    });
 }
 
 function renderUsers() {
     const usersList = document.getElementById('users-list');
-    if (usersList) {
-        usersList.innerHTML = adminData.users.map(user => `
-            <div class="admin-item">
-                <div class="admin-item-header">
-                    <div>
-                        <h4 class="admin-item-title">${user.username}</h4>
-                        <p class="admin-item-content">
-                            ${user.email ? `<span style="color: #9ca3af;">${user.email}</span><br>` : ''}
-                            Role: <span class="admin-badge ${user.role === 'admin' ? 'admin-badge-error' : 'admin-badge-secondary'}">${user.role}</span>
-                        </p>
-                        <p style="font-size: 0.75rem; color: #6b7280;">
-                            Created: ${new Date(user.created_at || user.createdAt).toLocaleDateString()}
-                        </p>
-                    </div>
-                    <div class="admin-item-actions">
-                        <button class="admin-button admin-button-secondary" onclick="editUser(${user.id})">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="admin-button admin-button-danger" onclick="deleteUser(${user.id})">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+    if (!usersList) return;
+
+    if (adminData.users.length === 0) {
+        usersList.innerHTML = '<div class="empty-state">Keine Benutzer vorhanden</div>';
+        return;
     }
+
+    usersList.innerHTML = adminData.users.map(user => `
+        <div class="admin-item">
+            <div class="item-content">
+                <h4>${user.username}</h4>
+                <p>Email: ${user.email}</p>
+                <p>Rolle: ${user.role}</p>
+                <p>Erstellt: ${formatDate(user.created_at)}</p>
+            </div>
+            <div class="item-actions">
+                <button class="btn-edit" onclick="editUser(${user.id})">Bearbeiten</button>
+                <button class="btn-delete" onclick="deleteUser(${user.id})">Löschen</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 function renderAnnouncements() {
     const announcementsList = document.getElementById('announcements-list');
-    if (announcementsList) {
-        // Sort announcements based on current sort order
-        const sortedAnnouncements = sortItems([...adminData.announcements], adminData.sortOrder.announcements);
-        
-        announcementsList.innerHTML = `
-            <div class="admin-sort-controls">
-                <label class="admin-label">Sortieren nach:</label>
-                <select class="admin-input" style="width: auto; display: inline-block; margin-left: 0.5rem;" onchange="changeSortOrder('announcements', this.value)">
-                    <option value="date-desc" ${adminData.sortOrder.announcements === 'date-desc' ? 'selected' : ''}>Neueste zuerst</option>
-                    <option value="date-asc" ${adminData.sortOrder.announcements === 'date-asc' ? 'selected' : ''}>Älteste zuerst</option>
-                    <option value="title-asc" ${adminData.sortOrder.announcements === 'title-asc' ? 'selected' : ''}>Titel A-Z</option>
-                    <option value="title-desc" ${adminData.sortOrder.announcements === 'title-desc' ? 'selected' : ''}>Titel Z-A</option>
-                    <option value="type-asc" ${adminData.sortOrder.announcements === 'type-asc' ? 'selected' : ''}>Typ A-Z</option>
-                    <option value="status" ${adminData.sortOrder.announcements === 'status' ? 'selected' : ''}>Aktive zuerst</option>
-                </select>
-            </div>
-            ${sortedAnnouncements.map(announcement => `
-                <div class="admin-item">
-                    <div class="admin-item-header">
-                        <div>
-                            <h4 class="admin-item-title">${announcement.title}</h4>
-                            <p class="admin-item-content">${announcement.content}</p>
-                            <div style="margin-top: 0.5rem;">
-                                <span class="admin-badge admin-badge-${announcement.type}">${announcement.type}</span>
-                                ${announcement.active ? 
-                                    '<span class="admin-badge admin-badge-success"><i class="fas fa-eye"></i> Active</span>' : 
-                                    '<span class="admin-badge admin-badge-secondary"><i class="fas fa-eye-slash"></i> Inactive</span>'
-                                }
-                                <span style="font-size: 0.75rem; color: #6b7280; margin-left: 0.5rem;">
-                                    Erstellt: ${formatDate(announcement.created_at || announcement.createdAt)}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="admin-item-actions">
-                            <button class="admin-button admin-button-secondary" style="padding: 0.5rem;" onclick="editAnnouncement(${announcement.id})">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="admin-button admin-button-danger" style="padding: 0.5rem;" onclick="deleteAnnouncement(${announcement.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('')}
-        `;
+    if (!announcementsList) return;
+
+    const sortedAnnouncements = sortItems(adminData.announcements, adminData.sortOrder.announcements);
+
+    if (sortedAnnouncements.length === 0) {
+        announcementsList.innerHTML = '<div class="empty-state">Keine Ankündigungen vorhanden</div>';
+        return;
     }
+
+    announcementsList.innerHTML = sortedAnnouncements.map(announcement => `
+        <div class="admin-item">
+            <div class="item-content">
+                <h4>${announcement.title}</h4>
+                <p>${announcement.content}</p>
+                <p>Typ: ${announcement.type}</p>
+                <p>Status: ${announcement.active ? 'Aktiv' : 'Inaktiv'}</p>
+                <p>Erstellt: ${formatDate(announcement.created_at)}</p>
+            </div>
+            <div class="item-actions">
+                <button class="btn-edit" onclick="editAnnouncement(${announcement.id})">Bearbeiten</button>
+                <button class="btn-delete" onclick="deleteAnnouncement(${announcement.id})">Löschen</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 function renderNews() {
     const newsList = document.getElementById('news-list');
-    if (newsList) {
-        // Sort news based on current sort order
-        const sortedNews = sortItems([...adminData.news], adminData.sortOrder.news);
-        
-        newsList.innerHTML = `
-            <div class="admin-sort-controls">
-                <label class="admin-label">Sortieren nach:</label>
-                <select class="admin-input" style="width: auto; display: inline-block; margin-left: 0.5rem;" onchange="changeSortOrder('news', this.value)">
-                    <option value="date-desc" ${adminData.sortOrder.news === 'date-desc' ? 'selected' : ''}>Neueste zuerst</option>
-                    <option value="date-asc" ${adminData.sortOrder.news === 'date-asc' ? 'selected' : ''}>Älteste zuerst</option>
-                    <option value="title-asc" ${adminData.sortOrder.news === 'title-asc' ? 'selected' : ''}>Titel A-Z</option>
-                    <option value="title-desc" ${adminData.sortOrder.news === 'title-desc' ? 'selected' : ''}>Titel Z-A</option>
-                    <option value="status" ${adminData.sortOrder.news === 'status' ? 'selected' : ''}>Veröffentlichte zuerst</option>
-                </select>
-            </div>
-            ${sortedNews.map(article => `
-                <div class="admin-item">
-                    <div class="admin-item-header">
-                        <div>
-                            <h4 class="admin-item-title">${article.title}</h4>
-                            <p class="admin-item-content">${article.excerpt || article.content?.substring(0, 150) + '...'}</p>
-                            <div style="margin-top: 0.5rem;">
-                                ${article.published ? 
-                                    '<span class="admin-badge admin-badge-success"><i class="fas fa-eye"></i> Published</span>' : 
-                                    '<span class="admin-badge admin-badge-secondary"><i class="fas fa-eye-slash"></i> Draft</span>'
-                                }
-                                <span style="font-size: 0.75rem; color: #6b7280; margin-left: 0.5rem;">
-                                    Erstellt: ${formatDate(article.created_at || article.createdAt)}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="admin-item-actions">
-                            <button class="admin-button admin-button-secondary" style="padding: 0.5rem;" onclick="editNews(${article.id})">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="admin-button admin-button-danger" style="padding: 0.5rem;" onclick="deleteNews(${article.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('')}
-        `;
-    }
-}
+    if (!newsList) return;
 
-function renderTrainingPrograms() {
-    const trainingList = document.getElementById('training-list');
-    if (trainingList) {
-        trainingList.innerHTML = adminData.trainingPrograms.map(program => `
-            <div class="admin-item">
-                <div class="admin-item-header">
-                    <div>
-                        <h4 class="admin-item-title">${program.name}</h4>
-                        <p class="admin-item-content">${program.description}</p>
-                        <div style="margin-top: 0.5rem;">
-                            ${program.popular ? '<span class="admin-badge" style="background: var(--brand-orange);">Popular</span>' : ''}
-                            ${program.active ? 
-                                '<span class="admin-badge admin-badge-success">Active</span>' : 
-                                '<span class="admin-badge admin-badge-secondary">Inactive</span>'
-                            }
-                            <span style="font-size: 0.875rem; color: #9ca3af; margin-left: 0.5rem;">
-                                Price: ${program.price}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+    const sortedNews = sortItems(adminData.news, adminData.sortOrder.news);
+
+    if (sortedNews.length === 0) {
+        newsList.innerHTML = '<div class="empty-state">Keine Nachrichten vorhanden</div>';
+        return;
     }
+
+    newsList.innerHTML = sortedNews.map(news => `
+        <div class="admin-item">
+            <div class="item-content">
+                <h4>${news.title}</h4>
+                <p>${news.content}</p>
+                <p>Autor: ${news.author}</p>
+                <p>Status: ${news.published ? 'Veröffentlicht' : 'Entwurf'}</p>
+                <p>Erstellt: ${formatDate(news.created_at)}</p>
+            </div>
+            <div class="item-actions">
+                <button class="btn-edit" onclick="editNews(${news.id})">Bearbeiten</button>
+                <button class="btn-delete" onclick="deleteNews(${news.id})">Löschen</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 function editAnnouncement(id) {
@@ -460,168 +441,164 @@ function editAnnouncement(id) {
     if (!announcement) return;
 
     adminData.editingAnnouncement = announcement;
-    
+
     document.getElementById('announcement-title').value = announcement.title;
     document.getElementById('announcement-content').value = announcement.content;
     document.getElementById('announcement-type').value = announcement.type;
     document.getElementById('announcement-active').checked = announcement.active;
-    
-    document.getElementById('announcement-form-title').textContent = 'Edit Announcement';
-    document.getElementById('announcement-submit-btn').textContent = 'Update';
-    document.getElementById('announcement-cancel-btn').classList.remove('hidden');
+
+    const submitBtn = document.querySelector('#announcement-form button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.textContent = 'Ankündigung Aktualisieren';
+    }
+
+    const cancelBtn = document.getElementById('cancel-announcement-edit');
+    if (cancelBtn) {
+        cancelBtn.style.display = 'inline-block';
+    }
 }
 
 function cancelAnnouncementEdit() {
     adminData.editingAnnouncement = null;
     document.getElementById('announcement-form').reset();
-    document.getElementById('announcement-active').checked = true;
-    document.getElementById('announcement-form-title').textContent = 'Create Announcement';
-    document.getElementById('announcement-submit-btn').textContent = 'Create';
-    document.getElementById('announcement-cancel-btn').classList.add('hidden');
+    
+    const submitBtn = document.querySelector('#announcement-form button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.textContent = 'Ankündigung Erstellen';
+    }
+
+    const cancelBtn = document.getElementById('cancel-announcement-edit');
+    if (cancelBtn) {
+        cancelBtn.style.display = 'none';
+    }
 }
 
-async function deleteAnnouncement(id) {
-    if (!confirm('Are you sure you want to delete this announcement?')) return;
-    
-    try {
-        await apiRequest(`/api/admin/announcements/${id}`, {
-            method: 'DELETE'
-        });
+function deleteAnnouncement(id) {
+    if (confirm('Sind Sie sicher, dass Sie diese Ankündigung löschen möchten?')) {
+        adminData.announcements = adminData.announcements.filter(a => a.id !== id);
+        saveLocalData();
         loadAdminData();
-    } catch (error) {
-        alert('Error: ' + error.message);
     }
 }
 
 function editNews(id) {
-    const article = adminData.news.find(n => n.id === id);
-    if (!article) return;
+    const news = adminData.news.find(n => n.id === id);
+    if (!news) return;
 
-    adminData.editingNews = article;
-    
-    document.getElementById('news-title').value = article.title;
-    document.getElementById('news-excerpt').value = article.excerpt;
-    document.getElementById('news-content').value = article.content;
-    document.getElementById('news-published').checked = article.published;
-    
-    document.getElementById('news-form-title').textContent = 'Edit News Article';
-    document.getElementById('news-submit-btn').textContent = 'Update';
-    document.getElementById('news-cancel-btn').classList.remove('hidden');
-}
+    adminData.editingNews = news;
 
-// User Management Functions
-function editUser(userId) {
-    const user = adminData.users.find(u => u.id === userId);
-    if (user) {
-        adminData.editingUser = user;
-        document.getElementById('user-username').value = user.username;
-        document.getElementById('user-password').value = ''; // Don't show existing password
-        document.getElementById('user-email').value = user.email || '';
-        document.getElementById('user-role').value = user.role;
-        
-        document.getElementById('user-form-title').textContent = 'Benutzer bearbeiten';
-        document.getElementById('user-submit-btn').textContent = 'Aktualisieren';
-        document.getElementById('user-cancel-btn').classList.remove('hidden');
-        
-        // Switch to users tab if not already there
-        showAdminTab('users');
+    document.getElementById('news-title').value = news.title;
+    document.getElementById('news-content').value = news.content;
+    document.getElementById('news-author').value = news.author;
+    document.getElementById('news-published').checked = news.published;
+
+    const submitBtn = document.querySelector('#news-form button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.textContent = 'Nachricht Aktualisieren';
+    }
+
+    const cancelBtn = document.getElementById('cancel-news-edit');
+    if (cancelBtn) {
+        cancelBtn.style.display = 'inline-block';
     }
 }
 
-async function deleteUser(userId) {
+function editUser(userId) {
     const user = adminData.users.find(u => u.id === userId);
-    if (user && confirm(`Sind Sie sicher, dass Sie den Benutzer "${user.username}" löschen möchten?`)) {
-        try {
-            await apiRequest(`/api/admin/users/${userId}`, {
-                method: 'DELETE'
-            });
-            loadAdminData();
-            alert('Benutzer erfolgreich gelöscht!');
-        } catch (error) {
-            alert('Fehler beim Löschen des Benutzers: ' + error.message);
-        }
+    if (!user) return;
+
+    adminData.editingUser = user;
+
+    document.getElementById('user-username').value = user.username;
+    document.getElementById('user-email').value = user.email;
+    document.getElementById('user-role').value = user.role;
+
+    const submitBtn = document.querySelector('#user-form button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.textContent = 'Benutzer Aktualisieren';
+    }
+
+    const cancelBtn = document.getElementById('cancel-user-edit');
+    if (cancelBtn) {
+        cancelBtn.style.display = 'inline-block';
+    }
+}
+
+function deleteUser(userId) {
+    if (confirm('Sind Sie sicher, dass Sie diesen Benutzer löschen möchten?')) {
+        adminData.users = adminData.users.filter(u => u.id !== userId);
+        saveLocalData();
+        loadAdminData();
     }
 }
 
 function cancelUserEdit() {
     adminData.editingUser = null;
     document.getElementById('user-form').reset();
-    document.getElementById('user-form-title').textContent = 'Neuen Benutzer erstellen';
-    document.getElementById('user-submit-btn').textContent = 'Benutzer erstellen';
-    document.getElementById('user-cancel-btn').classList.add('hidden');
+    
+    const submitBtn = document.querySelector('#user-form button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.textContent = 'Benutzer Erstellen';
+    }
+
+    const cancelBtn = document.getElementById('cancel-user-edit');
+    if (cancelBtn) {
+        cancelBtn.style.display = 'none';
+    }
 }
 
 function cancelNewsEdit() {
     adminData.editingNews = null;
     document.getElementById('news-form').reset();
-    document.getElementById('news-form-title').textContent = 'News Artikel erstellen';
-    document.getElementById('news-submit-btn').textContent = 'Erstellen';
-    document.getElementById('news-cancel-btn').classList.add('hidden');
-}
-
-async function deleteNews(id) {
-    if (!confirm('Sind Sie sicher, dass Sie diesen News-Artikel löschen möchten?')) return;
     
-    try {
-        await apiRequest(`/api/admin/news/${id}`, {
-            method: 'DELETE'
-        });
-        loadAdminData();
-    } catch (error) {
-        alert('Error: ' + error.message);
+    const submitBtn = document.querySelector('#news-form button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.textContent = 'Nachricht Erstellen';
+    }
+
+    const cancelBtn = document.getElementById('cancel-news-edit');
+    if (cancelBtn) {
+        cancelBtn.style.display = 'none';
     }
 }
 
-// Utility Functions for Sorting and Date Formatting
+function deleteNews(id) {
+    if (confirm('Sind Sie sicher, dass Sie diese Nachricht löschen möchten?')) {
+        adminData.news = adminData.news.filter(n => n.id !== id);
+        saveLocalData();
+        loadAdminData();
+    }
+}
+
 function formatDate(dateString) {
-    if (!dateString) return 'Unbekannt';
-    
     const date = new Date(dateString);
-    const options = { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric',
+    return date.toLocaleDateString('de-DE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
         hour: '2-digit',
         minute: '2-digit'
-    };
-    
-    return date.toLocaleDateString('de-DE', options);
+    });
 }
 
 function sortItems(items, sortOrder) {
-    return items.sort((a, b) => {
-        switch(sortOrder) {
-            case 'date-desc':
-                return new Date(b.created_at || b.createdAt) - new Date(a.created_at || a.createdAt);
-            case 'date-asc':
-                return new Date(a.created_at || a.createdAt) - new Date(b.created_at || b.createdAt);
-            case 'title-asc':
-                return a.title.localeCompare(b.title);
-            case 'title-desc':
-                return b.title.localeCompare(a.title);
-            case 'type-asc':
-                return a.type ? a.type.localeCompare(b.type) : 0;
-            case 'status':
-                // For announcements: active first, for news: published first
-                if (a.active !== undefined) {
-                    return b.active - a.active;
-                } else if (a.published !== undefined) {
-                    return b.published - a.published;
-                }
-                return 0;
-            default:
-                return 0;
-        }
-    });
+    const sorted = [...items];
+    
+    switch (sortOrder) {
+        case 'date-asc':
+            return sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        case 'date-desc':
+            return sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        case 'title-asc':
+            return sorted.sort((a, b) => a.title.localeCompare(b.title));
+        case 'title-desc':
+            return sorted.sort((a, b) => b.title.localeCompare(a.title));
+        default:
+            return sorted;
+    }
 }
 
 function changeSortOrder(type, newOrder) {
     adminData.sortOrder[type] = newOrder;
-    
-    // Re-render the appropriate section
-    if (type === 'announcements') {
-        renderAnnouncements();
-    } else if (type === 'news') {
-        renderNews();
-    }
+    loadAdminData();
 }

@@ -137,50 +137,134 @@ app.get('/admin/mysql-setup', (req, res) => {
 app.post('/api/mysql/test', async (req, res) => {
   const { host, port, database, user, password } = req.body;
   
+  // Validate required fields
+  if (!host || !port || !database || !user) {
+    return res.status(400).json({ error: 'Alle Felder außer Passwort sind erforderlich' });
+  }
+  
+  let connection = null;
+  
   try {
-    const mysql = require('mysql2/promise');
-    const connection = await mysql.createConnection({
-      host,
-      port,
-      database,
-      user,
-      password,
-      timeout: 5000
+    // Try to load mysql2 module
+    let mysql;
+    try {
+      mysql = require('mysql2/promise');
+    } catch (moduleError) {
+      return res.status(500).json({ error: 'MySQL2-Modul nicht verfügbar. Bitte installieren Sie mysql2.' });
+    }
+    
+    connection = await mysql.createConnection({
+      host: host.trim(),
+      port: parseInt(port),
+      database: database.trim(),
+      user: user.trim(),
+      password: password || '',
+      connectTimeout: 10000,
+      acquireTimeout: 10000
     });
     
-    await connection.execute('SELECT 1');
+    await connection.execute('SELECT 1 as test');
     await connection.end();
     
-    res.json({ success: true, message: 'Connection successful' });
+    res.json({ success: true, message: 'Verbindung erfolgreich' });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error('MySQL test error:', error);
+    
+    // Close connection if it was created
+    if (connection) {
+      try {
+        await connection.end();
+      } catch (closeError) {
+        console.error('Error closing test connection:', closeError);
+      }
+    }
+    
+    // Return specific error message
+    let errorMessage = error.message;
+    if (error.code === 'ECONNREFUSED') {
+      errorMessage = 'Verbindung verweigert. Überprüfen Sie, ob MySQL läuft und die Verbindungsdaten korrekt sind.';
+    } else if (error.code === 'ER_ACCESS_DENIED_ERROR') {
+      errorMessage = 'Zugriff verweigert. Überprüfen Sie Benutzername und Passwort.';
+    } else if (error.code === 'ER_BAD_DB_ERROR') {
+      errorMessage = 'Datenbank nicht gefunden. Überprüfen Sie den Datenbanknamen.';
+    } else if (error.code === 'ENOTFOUND') {
+      errorMessage = 'Host nicht gefunden. Überprüfen Sie die Hostadresse.';
+    }
+    
+    res.status(400).json({ error: errorMessage });
   }
 });
 
 app.post('/api/mysql/configure', async (req, res) => {
   const { host, port, database, user, password } = req.body;
   
+  // Validate required fields
+  if (!host || !port || !database || !user) {
+    return res.status(400).json({ error: 'Alle Felder außer Passwort sind erforderlich' });
+  }
+  
   try {
-    const mysql = require('mysql2/promise');
+    // Try to load mysql2 module
+    let mysql;
+    try {
+      mysql = require('mysql2/promise');
+    } catch (moduleError) {
+      return res.status(500).json({ error: 'MySQL2-Modul nicht verfügbar. Bitte installieren Sie mysql2.' });
+    }
+    
+    // Create MySQL connection
     mysqlConnection = await mysql.createConnection({
-      host,
-      port,
-      database,
-      user,
-      password
+      host: host.trim(),
+      port: parseInt(port),
+      database: database.trim(),
+      user: user.trim(),
+      password: password || '',
+      connectTimeout: 10000,
+      acquireTimeout: 10000
     });
     
     // Test the connection
-    await mysqlConnection.execute('SELECT 1');
+    await mysqlConnection.execute('SELECT 1 as test');
     usingMySQL = true;
     
     // Save configuration for future restarts
-    const config = { host, port, database, user, password };
+    const config = { 
+      host: host.trim(), 
+      port: parseInt(port), 
+      database: database.trim(), 
+      user: user.trim(), 
+      password: password || '' 
+    };
     await fs.writeFile('./mysql-config.json', JSON.stringify(config, null, 2));
     
-    res.json({ success: true, message: 'MySQL configured successfully' });
+    console.log('MySQL connection configured successfully');
+    res.json({ success: true, message: 'MySQL erfolgreich konfiguriert' });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error('MySQL configuration error:', error);
+    
+    // Close connection if it was created
+    if (mysqlConnection) {
+      try {
+        await mysqlConnection.end();
+      } catch (closeError) {
+        console.error('Error closing MySQL connection:', closeError);
+      }
+      mysqlConnection = null;
+    }
+    
+    usingMySQL = false;
+    
+    // Return specific error message
+    let errorMessage = error.message;
+    if (error.code === 'ECONNREFUSED') {
+      errorMessage = 'Verbindung verweigert. Überprüfen Sie, ob MySQL läuft und die Verbindungsdaten korrekt sind.';
+    } else if (error.code === 'ER_ACCESS_DENIED_ERROR') {
+      errorMessage = 'Zugriff verweigert. Überprüfen Sie Benutzername und Passwort.';
+    } else if (error.code === 'ER_BAD_DB_ERROR') {
+      errorMessage = 'Datenbank nicht gefunden. Überprüfen Sie den Datenbanknamen.';
+    }
+    
+    res.status(400).json({ error: errorMessage });
   }
 });
 

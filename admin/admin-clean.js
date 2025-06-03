@@ -26,6 +26,9 @@ function initializeAdminPanel() {
     
     // Setup mobile menu
     setupMobileMenu();
+    
+    // Setup periodic session validation (every 5 minutes)
+    setInterval(validateSession, 5 * 60 * 1000);
 }
 
 // Mobile Menu Setup
@@ -65,6 +68,129 @@ function toggleMobileMenu() {
     if (sidebar) {
         sidebar.classList.toggle('open');
     }
+}
+
+// Session Validation
+async function validateSession() {
+    try {
+        const response = await fetch('/admin/validate-session.php', {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Session validation failed');
+        }
+        
+        const result = await response.json();
+        
+        if (!result.valid) {
+            console.warn('Session invalid:', result.message);
+            handleInvalidSession(result.message);
+            return false;
+        }
+        
+        // Session ist gültig - aktualisiere Benutzerdaten falls nötig
+        if (result.username) {
+            adminData.currentUser = {
+                username: result.username,
+                role: result.role,
+                email: result.email || ''
+            };
+        }
+        
+        return true;
+        
+    } catch (error) {
+        console.error('Session validation error:', error);
+        handleInvalidSession('Verbindungsfehler bei Session-Überprüfung');
+        return false;
+    }
+}
+
+// Handle invalid session
+function handleInvalidSession(message) {
+    // Zeige Warnung
+    showAlert('Session ungültig: ' + message + ' Sie werden abgemeldet.', 'error');
+    
+    // Kurze Verzögerung für Benutzer-Feedback
+    setTimeout(() => {
+        // Session-Daten löschen
+        adminData.isLoggedIn = false;
+        adminData.sessionId = null;
+        adminData.currentUser = null;
+        localStorage.removeItem('adminSessionId');
+        
+        // Umleitung zur Login-Seite
+        window.location.href = '/admin/index.php';
+    }, 2000);
+}
+
+// Alert system
+function showAlert(message, type = 'info') {
+    // Erstelle Alert-Element falls nicht vorhanden
+    let alertContainer = document.getElementById('alert-container');
+    if (!alertContainer) {
+        alertContainer = document.createElement('div');
+        alertContainer.id = 'alert-container';
+        alertContainer.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        `;
+        document.body.appendChild(alertContainer);
+    }
+    
+    // Erstelle Alert
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} show`;
+    alert.textContent = message;
+    alert.style.cssText = `
+        padding: 1rem 1.5rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+    `;
+    
+    // Farben je nach Typ
+    const colors = {
+        'error': { bg: 'rgba(220, 53, 69, 0.9)', color: 'white' },
+        'warning': { bg: 'rgba(255, 193, 7, 0.9)', color: '#333' },
+        'success': { bg: 'rgba(40, 167, 69, 0.9)', color: 'white' },
+        'info': { bg: 'rgba(23, 162, 184, 0.9)', color: 'white' }
+    };
+    
+    const color = colors[type] || colors['info'];
+    alert.style.backgroundColor = color.bg;
+    alert.style.color = color.color;
+    
+    alertContainer.appendChild(alert);
+    
+    // Animation einblenden
+    setTimeout(() => {
+        alert.style.opacity = '1';
+        alert.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Automatisch ausblenden
+    setTimeout(() => {
+        alert.style.opacity = '0';
+        alert.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }, 300);
+    }, 5000);
 }
 
 // Admin Panel Functions
@@ -118,7 +244,13 @@ async function loadAdminData() {
 }
 
 // Section Navigation
-function showSection(sectionName) {
+async function showSection(sectionName) {
+    // Validiere Session vor Sektionswechsel
+    const isValid = await validateSession();
+    if (!isValid) {
+        return; // Session ungültig, Benutzer wird umgeleitet
+    }
+    
     // Verstecke alle Sections
     document.querySelectorAll('.content-section').forEach(section => {
         section.classList.remove('active');
@@ -139,6 +271,18 @@ function showSection(sectionName) {
     const navLink = document.querySelector(`.nav-link[onclick="showSection('${sectionName}')"]`);
     if (navLink) {
         navLink.classList.add('active');
+    }
+    
+    // Update Seitentitel
+    const pageTitle = document.getElementById('page-title');
+    if (pageTitle) {
+        const titles = {
+            'dashboard': 'Dashboard',
+            'users': 'Benutzer',
+            'announcements': 'Ankündigungen',
+            'news': 'News'
+        };
+        pageTitle.textContent = titles[sectionName] || 'Admin Panel';
     }
     
     // Lade entsprechende Daten

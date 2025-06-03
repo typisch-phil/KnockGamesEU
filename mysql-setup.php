@@ -312,6 +312,9 @@ $currentDatabase = $isConnected ? 'MySQL' : 'JSON-Dateien';
                 <button class="provider-btn" onclick="loadTemplate('railway')">Railway</button>
                 <button class="provider-btn" onclick="loadTemplate('aws')">AWS RDS</button>
                 <button class="provider-btn" onclick="loadTemplate('digitalocean')">DigitalOcean</button>
+                <button class="provider-btn" onclick="setupPhpMyAdmin()" style="background: rgba(40, 167, 69, 0.2); border-color: #28a745; color: #28a745;">
+                    📊 phpMyAdmin Setup
+                </button>
             </div>
         </div>
 
@@ -475,6 +478,13 @@ $currentDatabase = $isConnected ? 'MySQL' : 'JSON-Dateien';
             .catch(error => {
                 showAlert('Netzwerkfehler: ' + error.message, 'error');
             });
+        }
+
+        function setupPhpMyAdmin() {
+            showAlert('Weiterleitung zu phpMyAdmin Setup...', 'success');
+            setTimeout(() => {
+                window.location.href = '/phpmyadmin-setup';
+            }, 1000);
         }
     </script>
 </body>

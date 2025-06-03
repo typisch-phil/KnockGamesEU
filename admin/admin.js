@@ -8,7 +8,8 @@ let adminData = {
     news: [],
     trainingPrograms: [],
     editingAnnouncement: null,
-    editingNews: null
+    editingNews: null,
+    editingUser: null
 };
 
 // Initialize Admin Panel when DOM is loaded
@@ -98,6 +99,42 @@ function initializeAdminPanel() {
                 document.getElementById('announcement-active').checked = true;
                 cancelAnnouncementEdit();
                 loadAdminData();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+    }
+
+    // User Form
+    const userForm = document.getElementById('user-form');
+    if (userForm) {
+        userForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                username: document.getElementById('user-username').value,
+                password: document.getElementById('user-password').value,
+                email: document.getElementById('user-email').value,
+                role: document.getElementById('user-role').value
+            };
+
+            try {
+                if (adminData.editingUser) {
+                    await apiRequest(`/api/admin/users/${adminData.editingUser.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(formData)
+                    });
+                } else {
+                    await apiRequest('/api/admin/users', {
+                        method: 'POST',
+                        body: JSON.stringify(formData)
+                    });
+                }
+
+                userForm.reset();
+                cancelUserEdit();
+                loadAdminData();
+                alert('User saved successfully!');
             } catch (error) {
                 alert('Error: ' + error.message);
             }
@@ -225,17 +262,17 @@ function adminLogout() {
 
 async function loadAdminData() {
     try {
-        const [users, announcements, news, trainingPrograms] = await Promise.all([
+        // Load users, announcements, and news (training programs endpoint doesn't exist in backend)
+        const [users, announcements, news] = await Promise.all([
             apiRequest('/api/admin/users'),
             apiRequest('/api/admin/announcements'),
-            apiRequest('/api/admin/news'),
-            apiRequest('/api/admin/training-programs')
+            apiRequest('/api/admin/news')
         ]);
 
         adminData.users = users;
         adminData.announcements = announcements;
         adminData.news = news;
-        adminData.trainingPrograms = trainingPrograms;
+        adminData.trainingPrograms = []; // Will be populated separately if needed
 
         updateDashboardStats();
         renderUsers();
@@ -269,11 +306,20 @@ function renderUsers() {
                     <div>
                         <h4 class="admin-item-title">${user.username}</h4>
                         <p class="admin-item-content">
+                            ${user.email ? `<span style="color: #9ca3af;">${user.email}</span><br>` : ''}
                             Role: <span class="admin-badge ${user.role === 'admin' ? 'admin-badge-error' : 'admin-badge-secondary'}">${user.role}</span>
                         </p>
                         <p style="font-size: 0.75rem; color: #6b7280;">
-                            Created: ${new Date(user.createdAt).toLocaleDateString()}
+                            Created: ${new Date(user.created_at || user.createdAt).toLocaleDateString()}
                         </p>
+                    </div>
+                    <div class="admin-item-actions">
+                        <button class="admin-button admin-button-secondary" onclick="editUser(${user.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="admin-button admin-button-danger" onclick="deleteUser(${user.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
                     </div>
                 </div>
             </div>
@@ -423,6 +469,48 @@ function editNews(id) {
     document.getElementById('news-form-title').textContent = 'Edit News Article';
     document.getElementById('news-submit-btn').textContent = 'Update';
     document.getElementById('news-cancel-btn').classList.remove('hidden');
+}
+
+// User Management Functions
+function editUser(userId) {
+    const user = adminData.users.find(u => u.id === userId);
+    if (user) {
+        adminData.editingUser = user;
+        document.getElementById('user-username').value = user.username;
+        document.getElementById('user-password').value = ''; // Don't show existing password
+        document.getElementById('user-email').value = user.email || '';
+        document.getElementById('user-role').value = user.role;
+        
+        document.getElementById('user-form-title').textContent = 'Edit User';
+        document.getElementById('user-submit-btn').textContent = 'Update';
+        document.getElementById('user-cancel-btn').classList.remove('hidden');
+        
+        // Switch to users tab if not already there
+        showAdminTab('users');
+    }
+}
+
+async function deleteUser(userId) {
+    const user = adminData.users.find(u => u.id === userId);
+    if (user && confirm(`Are you sure you want to delete user "${user.username}"?`)) {
+        try {
+            await apiRequest(`/api/admin/users/${userId}`, {
+                method: 'DELETE'
+            });
+            loadAdminData();
+            alert('User deleted successfully!');
+        } catch (error) {
+            alert('Error deleting user: ' + error.message);
+        }
+    }
+}
+
+function cancelUserEdit() {
+    adminData.editingUser = null;
+    document.getElementById('user-form').reset();
+    document.getElementById('user-form-title').textContent = 'Create New User';
+    document.getElementById('user-submit-btn').textContent = 'Create User';
+    document.getElementById('user-cancel-btn').classList.add('hidden');
 }
 
 function cancelNewsEdit() {

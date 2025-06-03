@@ -530,15 +530,15 @@ function editUser(userId) {
 
 async function deleteUser(userId) {
     const user = adminData.users.find(u => u.id === userId);
-    if (user && confirm(`Are you sure you want to delete user "${user.username}"?`)) {
+    if (user && confirm(`Sind Sie sicher, dass Sie den Benutzer "${user.username}" löschen möchten?`)) {
         try {
             await apiRequest(`/api/admin/users/${userId}`, {
                 method: 'DELETE'
             });
             loadAdminData();
-            alert('User deleted successfully!');
+            alert('Benutzer erfolgreich gelöscht!');
         } catch (error) {
-            alert('Error deleting user: ' + error.message);
+            alert('Fehler beim Löschen des Benutzers: ' + error.message);
         }
     }
 }
@@ -546,21 +546,21 @@ async function deleteUser(userId) {
 function cancelUserEdit() {
     adminData.editingUser = null;
     document.getElementById('user-form').reset();
-    document.getElementById('user-form-title').textContent = 'Create New User';
-    document.getElementById('user-submit-btn').textContent = 'Create User';
+    document.getElementById('user-form-title').textContent = 'Neuen Benutzer erstellen';
+    document.getElementById('user-submit-btn').textContent = 'Benutzer erstellen';
     document.getElementById('user-cancel-btn').classList.add('hidden');
 }
 
 function cancelNewsEdit() {
     adminData.editingNews = null;
     document.getElementById('news-form').reset();
-    document.getElementById('news-form-title').textContent = 'Create News Article';
-    document.getElementById('news-submit-btn').textContent = 'Create';
+    document.getElementById('news-form-title').textContent = 'News Artikel erstellen';
+    document.getElementById('news-submit-btn').textContent = 'Erstellen';
     document.getElementById('news-cancel-btn').classList.add('hidden');
 }
 
 async function deleteNews(id) {
-    if (!confirm('Are you sure you want to delete this news article?')) return;
+    if (!confirm('Sind Sie sicher, dass Sie diesen News-Artikel löschen möchten?')) return;
     
     try {
         await apiRequest(`/api/admin/news/${id}`, {
@@ -574,7 +574,7 @@ async function deleteNews(id) {
 
 // Utility Functions for Sorting and Date Formatting
 function formatDate(dateString) {
-    if (!dateString) return 'Unknown';
+    if (!dateString) return 'Unbekannt';
     
     const date = new Date(dateString);
     const options = { 

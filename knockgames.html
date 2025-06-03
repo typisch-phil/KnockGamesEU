@@ -1526,7 +1526,123 @@
             if (statsSection) {
                 observer.observe(statsSection);
             }
+            
+            // Load news and announcements
+            loadAnnouncements();
+            loadNews();
         });
+
+        // News & Announcements functionality
+        async function loadAnnouncements() {
+            const container = document.getElementById('announcements-container');
+            
+            try {
+                const response = await fetch('/api/announcements');
+                if (!response.ok) {
+                    throw new Error('Failed to load announcements');
+                }
+                
+                const announcements = await response.json();
+                
+                if (announcements.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-info-circle"></i>
+                            <p>Keine Ankündigungen verfügbar</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = announcements.map(announcement => `
+                    <div class="announcement-card">
+                        <div class="announcement-header">
+                            <div>
+                                <h4 class="announcement-title">${escapeHtml(announcement.title)}</h4>
+                                <span class="announcement-type ${announcement.type}">${announcement.type}</span>
+                            </div>
+                        </div>
+                        <div class="announcement-content">${escapeHtml(announcement.content)}</div>
+                        <div class="announcement-date">
+                            ${new Date(announcement.createdAt).toLocaleDateString('de-DE', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Fehler beim Laden der Ankündigungen</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadNews() {
+            const container = document.getElementById('news-container');
+            
+            try {
+                const response = await fetch('/api/news');
+                if (!response.ok) {
+                    throw new Error('Failed to load news');
+                }
+                
+                const newsArticles = await response.json();
+                
+                if (newsArticles.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-newspaper"></i>
+                            <p>Keine News verfügbar</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = newsArticles.map(article => `
+                    <div class="news-card">
+                        <div class="news-header">
+                            <h4 class="news-title">${escapeHtml(article.title)}</h4>
+                        </div>
+                        ${article.excerpt ? `<div class="news-excerpt">${escapeHtml(article.excerpt)}</div>` : ''}
+                        <div class="news-content">${escapeHtml(article.content.substring(0, 200))}${article.content.length > 200 ? '...' : ''}</div>
+                        <div class="news-date">
+                            ${new Date(article.createdAt).toLocaleDateString('de-DE', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Fehler beim Laden der News</p>
+                    </div>
+                `;
+            }
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
         // Copy IP function
         function copyIP() {

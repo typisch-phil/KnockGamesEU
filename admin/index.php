@@ -143,12 +143,13 @@ if ($db->isConnected()) {
                 
                 <button type="submit" name="login" class="btn btn-primary">Anmelden</button>
             </form>
-            
+            <!--
             <div class="demo-credentials">
                 <p><strong>Demo-Zugangsdaten:</strong></p>
                 <p>Benutzername: admin</p>
                 <p>Passwort: admin123</p>
             </div>
+            -->
         </div>
     </div>
     <?php else: ?>

@@ -1,10 +1,11 @@
 <?php
 // KnockGames.eu - MySQL Datenbankkonfiguration
 define('DB_HOST', 'localhost');
-define('DB_PORT', 3306);
+define('DB_PORT', 3307);
 define('DB_NAME', 'knockgames');
 define('DB_USER', 'root');
 define('DB_PASS', '');
+define('DB_SOCKET', '/tmp/mysql.sock');
 define('DB_TYPE', 'mysql');
 
 // Session Konfiguration
@@ -22,22 +23,52 @@ class Database {
     
     private function __construct() {
         try {
-            // MySQL-Verbindung ohne Datenbank für Erstellung
-            $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";charset=utf8mb4";
-            $tempConnection = new PDO($dsn, DB_USER, DB_PASS, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
+            // Versuche verschiedene MySQL-Verbindungsmethoden
+            $connectionAttempts = [
+                // Socket-basierte Verbindung
+                "mysql:unix_socket=" . DB_SOCKET . ";charset=utf8mb4",
+                // Port-basierte Verbindung
+                "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";charset=utf8mb4",
+                // Standard localhost Verbindung
+                "mysql:host=localhost;charset=utf8mb4"
+            ];
             
-            // Erstelle Datenbank falls sie nicht existiert
-            $tempConnection->exec("CREATE DATABASE IF NOT EXISTS " . DB_NAME . " CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            $tempConnection = null;
+            foreach ($connectionAttempts as $dsn) {
+                try {
+                    $tempConnection = new PDO($dsn, DB_USER, DB_PASS, [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_TIMEOUT => 5
+                    ]);
+                    break;
+                } catch (PDOException $e) {
+                    continue;
+                }
+            }
             
-            // Verbinde mit der spezifischen Datenbank
-            $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
-            $this->connection = new PDO($dsn, DB_USER, DB_PASS, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false
-            ]);
+            if ($tempConnection) {
+                // Erstelle Datenbank falls sie nicht existiert
+                $tempConnection->exec("CREATE DATABASE IF NOT EXISTS " . DB_NAME . " CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                
+                // Verbinde mit der spezifischen Datenbank
+                foreach ($connectionAttempts as $dsn) {
+                    try {
+                        $dbDsn = str_replace(';charset=utf8mb4', ';dbname=' . DB_NAME . ';charset=utf8mb4', $dsn);
+                        $this->connection = new PDO($dbDsn, DB_USER, DB_PASS, [
+                            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                            PDO::ATTR_EMULATE_PREPARES => false
+                        ]);
+                        break;
+                    } catch (PDOException $e) {
+                        continue;
+                    }
+                }
+            }
+            
+            if (!$this->connection) {
+                throw new PDOException("Alle MySQL-Verbindungsversuche fehlgeschlagen");
+            }
         } catch (PDOException $e) {
             // Fallback auf JSON-Dateien wenn MySQL nicht verfügbar
             $this->connection = null;

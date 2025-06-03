@@ -52,6 +52,11 @@ if ($requestUri === '/admin/mysql-setup' || $requestUri === '/admin/mysql-setup/
     return;
 }
 
+if ($requestUri === '/mysql-setup' || $requestUri === '/mysql-setup/') {
+    require_once 'mysql-setup.php';
+    return;
+}
+
 // Hauptseite - Verwende PHP-Version
 if ($requestUri === '/') {
     require_once 'index.php';

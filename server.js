@@ -34,7 +34,7 @@ const phpServer = spawn('php', ['-S', '0.0.0.0:5000', '-t', '.', 'router.php'], 
 console.log('Server läuft auf http://0.0.0.0:5000');
 console.log('Admin Panel: http://0.0.0.0:5000/admin');
 console.log('Standard Admin-Zugangsdaten: admin/admin123');
-console.log('PostgreSQL-Datenbank verfügbar (mit JSON-Fallback)');
+console.log('MySQL-Datenbank konfiguriert (mit JSON-Fallback)');
 console.log('');
 
 phpServer.on('error', (err) => {

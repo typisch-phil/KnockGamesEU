@@ -1,10 +1,10 @@
 [
-  {
-    "id": 1,
-    "username": "admin",
-    "password": "admin123",
-    "email": "admin@knockgames.eu",
-    "role": "admin",
-    "created_at": "2025-06-03T08:55:07.355Z"
-  }
+    {
+        "id": 1,
+        "username": "admin",
+        "password": "admin123",
+        "role": "admin",
+        "email": "admin@knockgames.eu",
+        "created_at": "2025-06-03T13:42:13+00:00"
+    }
 ]

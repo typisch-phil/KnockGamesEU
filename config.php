@@ -5,11 +5,11 @@ $databaseUrl = getenv('DATABASE_URL');
 if ($databaseUrl) {
     // Parse DATABASE_URL für PostgreSQL
     $dbParts = parse_url($databaseUrl);
-    define('DB_HOST', $dbParts['host']);
-    define('DB_PORT', $dbParts['port']);
-    define('DB_NAME', ltrim($dbParts['path'], '/'));
-    define('DB_USER', $dbParts['user']);
-    define('DB_PASS', $dbParts['pass']);
+    define('DB_HOST', $dbParts['host'] ?? 'localhost');
+    define('DB_PORT', isset($dbParts['port']) ? (int)$dbParts['port'] : 5432);
+    define('DB_NAME', isset($dbParts['path']) ? ltrim($dbParts['path'], '/') : 'postgres');
+    define('DB_USER', $dbParts['user'] ?? 'postgres');
+    define('DB_PASS', $dbParts['pass'] ?? '');
     define('DB_TYPE', 'pgsql');
 } else {
     // Fallback auf MySQL
@@ -36,17 +36,29 @@ class Database {
     
     private function __construct() {
         try {
-            if (DB_TYPE === 'pgsql') {
+            // Verwende direkt die DATABASE_URL wenn verfügbar (für PostgreSQL)
+            $databaseUrl = getenv('DATABASE_URL');
+            if ($databaseUrl && DB_TYPE === 'pgsql') {
+                $this->connection = new PDO($databaseUrl, null, null, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false
+                ]);
+            } else if (DB_TYPE === 'pgsql') {
                 $dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME;
+                $this->connection = new PDO($dsn, DB_USER, DB_PASS, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false
+                ]);
             } else {
                 $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+                $this->connection = new PDO($dsn, DB_USER, DB_PASS, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false
+                ]);
             }
-            
-            $this->connection = new PDO($dsn, DB_USER, DB_PASS, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false
-            ]);
         } catch (PDOException $e) {
             // Fallback auf JSON-Dateien wenn Datenbank nicht verfügbar
             $this->connection = null;

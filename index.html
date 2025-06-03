@@ -1031,7 +1031,7 @@
                     </button>
                 </div>
                 <div class="server-ip">
-                    <p>Server IP: <span>play.knockgames.eu</span></p>
+                    <p>Server IP: <span>knockgames.eu</span></p>
                 </div>
             </div>
         </div>
@@ -1339,7 +1339,7 @@
                     <div class="server-info">
                         <p>
                             <span class="label">Server IP:</span><br>
-                            <span class="value">play.knockgames.eu</span>
+                            <span class="value">knockgames.eu</span>
                         </p>
                         <p>
                             <span class="label">Version:</span><br>
@@ -1389,7 +1389,7 @@
             <div class="quick-connect">
                 <h3>Schnell Verbinden</h3>
                 <p>Kopiere die Server-IP und füge sie in Minecraft ein:</p>
-                <div class="ip-display">play.knockgames.eu</div>
+                <div class="ip-display">knockgames.eu</div>
                 <div class="quick-connect-buttons">
                     <button class="btn-primary" onclick="copyIP()">
                         <i class="fas fa-copy"></i>
@@ -1646,7 +1646,7 @@
 
         // Copy IP function
         function copyIP() {
-            const ip = 'play.knockgames.eu';
+            const ip = 'knockgames.eu';
             
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(ip).then(function() {
@@ -1675,7 +1675,7 @@
         let lastStatusCheck = 0;
         const STATUS_CACHE_DURATION = 30000; // 30 seconds
 
-        async function checkServerStatus(host = 'play.knockgames.eu', port = 25565) {
+        async function checkServerStatus(host = 'knockgames.eu', port = 25565) {
             const now = Date.now();
             
             // Return cached result if still valid

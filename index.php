@@ -1028,7 +1028,7 @@ if ($db->isConnected()) {
             // Kommentiert aus wegen API-Fehlern - kann mit echtem Server reaktiviert werden
             
             try {
-                const response = await fetch('/minecraft-status.php?host=lydoria.de&port=25565');
+                const response = await fetch('/minecraft-status.php?host=77.90.15.172&port=25565');
                 const data = await response.json();
 
                 if (data.online) {

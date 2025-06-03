@@ -18,9 +18,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
     
+    $loginSuccess = false;
+    
+    // Prüfe Standard-Admin-Account
     if ($username === ADMIN_USERNAME && $password === ADMIN_PASSWORD) {
         $_SESSION['admin_logged_in'] = true;
         $_SESSION['admin_username'] = $username;
+        $_SESSION['admin_role'] = 'admin';
+        $loginSuccess = true;
+    } else {
+        // Prüfe Benutzer aus Datenbank/JSON
+        $db = Database::getInstance();
+        
+        if ($db->isConnected()) {
+            try {
+                $pdo = $db->getConnection();
+                $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? AND (role = 'admin' OR role = 'moderator')");
+                $stmt->execute([$username]);
+                $user = $stmt->fetch();
+                
+                if ($user && password_verify($password, $user['password'])) {
+                    $_SESSION['admin_logged_in'] = true;
+                    $_SESSION['admin_username'] = $user['username'];
+                    $_SESSION['admin_role'] = $user['role'];
+                    $_SESSION['admin_user_id'] = $user['id'];
+                    $loginSuccess = true;
+                }
+            } catch (PDOException $e) {
+                // Fallback auf JSON
+            }
+        }
+        
+        // Fallback: JSON-Storage
+        if (!$loginSuccess) {
+            $storage = new JsonStorage();
+            $users = $storage->read('users');
+            
+            foreach ($users as $user) {
+                if ($user['username'] === $username && 
+                    ($user['role'] === 'admin' || $user['role'] === 'moderator') &&
+                    password_verify($password, $user['password'])) {
+                    $_SESSION['admin_logged_in'] = true;
+                    $_SESSION['admin_username'] = $user['username'];
+                    $_SESSION['admin_role'] = $user['role'];
+                    $_SESSION['admin_user_id'] = $user['id'];
+                    $loginSuccess = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    if ($loginSuccess) {
         header('Location: /admin');
         exit;
     } else {

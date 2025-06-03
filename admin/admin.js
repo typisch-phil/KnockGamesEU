@@ -292,13 +292,13 @@ function updateDashboardStats() {
     document.getElementById('total-users').textContent = adminData.users.length;
     document.getElementById('total-announcements').textContent = adminData.announcements.length;
     document.getElementById('active-announcements').textContent = 
-        `${adminData.announcements.filter(a => a.active).length} active`;
+        `${adminData.announcements.filter(a => a.active).length} aktiv`;
     document.getElementById('total-news').textContent = adminData.news.length;
     document.getElementById('published-news').textContent = 
-        `${adminData.news.filter(n => n.published).length} published`;
+        `${adminData.news.filter(n => n.published).length} veröffentlicht`;
     document.getElementById('total-training').textContent = adminData.trainingPrograms.length;
     document.getElementById('active-training').textContent = 
-        `${adminData.trainingPrograms.filter(t => t.active).length} active`;
+        `${adminData.trainingPrograms.filter(t => t.active).length} aktiv`;
 }
 
 function renderUsers() {
@@ -519,8 +519,8 @@ function editUser(userId) {
         document.getElementById('user-email').value = user.email || '';
         document.getElementById('user-role').value = user.role;
         
-        document.getElementById('user-form-title').textContent = 'Edit User';
-        document.getElementById('user-submit-btn').textContent = 'Update';
+        document.getElementById('user-form-title').textContent = 'Benutzer bearbeiten';
+        document.getElementById('user-submit-btn').textContent = 'Aktualisieren';
         document.getElementById('user-cancel-btn').classList.remove('hidden');
         
         // Switch to users tab if not already there

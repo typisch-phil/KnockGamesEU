@@ -6,7 +6,7 @@ class MinecraftServerStatus {
     private $serverPort;
     private $timeout;
     
-    public function __construct($host = 'mc.hypixel.net', $port = 25565, $timeout = 5) {
+    public function __construct($host = 'lydoria.de', $port = 25565, $timeout = 5) {
         $this->serverHost = $host;
         $this->serverPort = $port;
         $this->timeout = $timeout;

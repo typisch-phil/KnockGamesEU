@@ -593,6 +593,21 @@
             border-radius: 50%;
         }
 
+        .status-card.online {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .status-card.offline {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .server-status .ping-text,
+        .server-status .players-text {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+        }
+
         .quick-connect {
             max-width: 32rem;
             margin: 0 auto;
@@ -874,7 +889,7 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <i class="fas fa-users stat-icon"></i>
-                    <div class="stat-number" data-target="1247">0</div>
+                    <div class="stat-number player-count" data-target="0">0</div>
                     <div class="stat-label">Aktive Spieler</div>
                 </div>
                 <div class="stat-card">
@@ -1126,7 +1141,7 @@
             </div>
             
             <div class="contact-grid">
-                <div class="contact-card">
+                <div class="contact-card status-card server-status">
                     <i class="fas fa-server contact-icon"></i>
                     <h3 class="contact-title">Server Verbindung</h3>
                     <div class="server-info">
@@ -1142,9 +1157,11 @@
                             <span class="label">Status:</span><br>
                             <span class="status">
                                 <span class="status-dot"></span>
-                                Online
+                                <span class="status-text">Checking...</span>
                             </span>
                         </p>
+                        <div class="ping-text" style="display: none;"></div>
+                        <div class="players-text" style="display: none;"></div>
                     </div>
                 </div>
                 
@@ -1345,6 +1362,111 @@
             }
         }
 
+        // Server status checker
+        let serverStatusCache = null;
+        let lastStatusCheck = 0;
+        const STATUS_CACHE_DURATION = 30000; // 30 seconds
+
+        async function checkServerStatus(host = 'play.knockgames.eu', port = 25565) {
+            const now = Date.now();
+            
+            // Return cached result if still valid
+            if (serverStatusCache && (now - lastStatusCheck) < STATUS_CACHE_DURATION) {
+                return serverStatusCache;
+            }
+
+            try {
+                // For the HTML version, we'll use a public Minecraft server status API
+                // Since we can't make direct TCP connections from browser
+                const response = await fetch(`https://api.mcsrvstat.us/3/${host}:${port}`);
+                const data = await response.json();
+                
+                const status = {
+                    online: data.online || false,
+                    players: data.players ? {
+                        online: data.players.online || 0,
+                        max: data.players.max || 0
+                    } : null,
+                    version: data.version,
+                    motd: data.motd ? data.motd.clean : null,
+                    ping: data.debug ? data.debug.ping : null
+                };
+
+                serverStatusCache = status;
+                lastStatusCheck = now;
+                return status;
+            } catch (error) {
+                const status = {
+                    online: false,
+                    error: 'Failed to check server status'
+                };
+                serverStatusCache = status;
+                lastStatusCheck = now;
+                return status;
+            }
+        }
+
+        // Update server status display
+        async function updateServerStatus() {
+            const status = await checkServerStatus();
+            
+            // Update stats section
+            const statusElements = document.querySelectorAll('.server-status');
+            statusElements.forEach(element => {
+                const statusDot = element.querySelector('.status-dot');
+                const statusText = element.querySelector('.status-text');
+                const pingText = element.querySelector('.ping-text');
+                const playersText = element.querySelector('.players-text');
+                
+                if (statusDot) {
+                    statusDot.style.background = status.online ? '#10b981' : '#ef4444';
+                }
+                
+                if (statusText) {
+                    statusText.textContent = status.online ? 'Online' : 'Offline';
+                    statusText.style.color = status.online ? '#10b981' : '#ef4444';
+                }
+                
+                if (pingText && status.ping) {
+                    pingText.textContent = `${status.ping}ms`;
+                    pingText.style.display = 'block';
+                } else if (pingText) {
+                    pingText.style.display = 'none';
+                }
+                
+                if (playersText && status.players) {
+                    playersText.textContent = `Players: ${status.players.online}/${status.players.max}`;
+                    playersText.style.display = 'block';
+                } else if (playersText) {
+                    playersText.style.display = 'none';
+                }
+            });
+
+            // Update player count in stats
+            const playerCountElement = document.querySelector('.player-count');
+            if (playerCountElement && status.players) {
+                animateCounter(playerCountElement, status.players.online);
+            }
+
+            // Update status card
+            const statusCard = document.querySelector('.status-card');
+            if (statusCard) {
+                if (status.online) {
+                    statusCard.classList.remove('offline');
+                    statusCard.classList.add('online');
+                } else {
+                    statusCard.classList.remove('online');
+                    statusCard.classList.add('offline');
+                }
+            }
+        }
+
+        // Start status checking
+        function startStatusUpdates() {
+            updateServerStatus();
+            setInterval(updateServerStatus, STATUS_CACHE_DURATION);
+        }
+
         // Simple notification system
         function showNotification(title, message, type = 'success') {
             const notification = document.createElement('div');
@@ -1394,6 +1516,9 @@
                     scrollToSection(sectionId);
                 });
             });
+
+            // Start server status updates
+            startStatusUpdates();
         });
     </script>
 </body>

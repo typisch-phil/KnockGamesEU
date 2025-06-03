@@ -41,10 +41,21 @@ export default function ContactSection() {
           </div>
           <div>
             <p className="text-gray-400 text-sm">Status:</p>
-            <p className="text-green-400 font-semibold flex items-center">
+            <p className={`font-semibold flex items-center ${
+              isLoading ? 'text-yellow-400' : 
+              serverStatus?.online ? 'text-green-400' : 'text-red-400'
+            }`}>
               <Circle className="w-2 h-2 mr-1 fill-current" />
-              Online
+              {isLoading ? 'Checking...' : serverStatus?.online ? 'Online' : 'Offline'}
             </p>
+            {serverStatus?.ping && (
+              <p className="text-gray-400 text-xs">Ping: {serverStatus.ping}ms</p>
+            )}
+            {serverStatus?.players && (
+              <p className="text-gray-400 text-xs">
+                Players: {serverStatus.players.online}/{serverStatus.players.max}
+              </p>
+            )}
           </div>
         </div>
       ),

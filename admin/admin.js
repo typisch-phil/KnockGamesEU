@@ -9,7 +9,11 @@ let adminData = {
     trainingPrograms: [],
     editingAnnouncement: null,
     editingNews: null,
-    editingUser: null
+    editingUser: null,
+    sortOrder: {
+        announcements: 'date-desc',
+        news: 'date-desc'
+    }
 };
 
 // Initialize Admin Panel when DOM is loaded
@@ -330,64 +334,98 @@ function renderUsers() {
 function renderAnnouncements() {
     const announcementsList = document.getElementById('announcements-list');
     if (announcementsList) {
-        announcementsList.innerHTML = adminData.announcements.map(announcement => `
-            <div class="admin-item">
-                <div class="admin-item-header">
-                    <div>
-                        <h4 class="admin-item-title">${announcement.title}</h4>
-                        <p class="admin-item-content">${announcement.content}</p>
-                        <div style="margin-top: 0.5rem;">
-                            <span class="admin-badge admin-badge-${announcement.type}">${announcement.type}</span>
-                            ${announcement.active ? 
-                                '<span class="admin-badge admin-badge-success"><i class="fas fa-eye"></i> Active</span>' : 
-                                '<span class="admin-badge admin-badge-secondary"><i class="fas fa-eye-slash"></i> Inactive</span>'
-                            }
+        // Sort announcements based on current sort order
+        const sortedAnnouncements = sortItems([...adminData.announcements], adminData.sortOrder.announcements);
+        
+        announcementsList.innerHTML = `
+            <div class="admin-sort-controls">
+                <label class="admin-label">Sort by:</label>
+                <select class="admin-input" style="width: auto; display: inline-block; margin-left: 0.5rem;" onchange="changeSortOrder('announcements', this.value)">
+                    <option value="date-desc" ${adminData.sortOrder.announcements === 'date-desc' ? 'selected' : ''}>Newest First</option>
+                    <option value="date-asc" ${adminData.sortOrder.announcements === 'date-asc' ? 'selected' : ''}>Oldest First</option>
+                    <option value="title-asc" ${adminData.sortOrder.announcements === 'title-asc' ? 'selected' : ''}>Title A-Z</option>
+                    <option value="title-desc" ${adminData.sortOrder.announcements === 'title-desc' ? 'selected' : ''}>Title Z-A</option>
+                    <option value="type-asc" ${adminData.sortOrder.announcements === 'type-asc' ? 'selected' : ''}>Type A-Z</option>
+                    <option value="status" ${adminData.sortOrder.announcements === 'status' ? 'selected' : ''}>Active First</option>
+                </select>
+            </div>
+            ${sortedAnnouncements.map(announcement => `
+                <div class="admin-item">
+                    <div class="admin-item-header">
+                        <div>
+                            <h4 class="admin-item-title">${announcement.title}</h4>
+                            <p class="admin-item-content">${announcement.content}</p>
+                            <div style="margin-top: 0.5rem;">
+                                <span class="admin-badge admin-badge-${announcement.type}">${announcement.type}</span>
+                                ${announcement.active ? 
+                                    '<span class="admin-badge admin-badge-success"><i class="fas fa-eye"></i> Active</span>' : 
+                                    '<span class="admin-badge admin-badge-secondary"><i class="fas fa-eye-slash"></i> Inactive</span>'
+                                }
+                                <span style="font-size: 0.75rem; color: #6b7280; margin-left: 0.5rem;">
+                                    Created: ${formatDate(announcement.created_at || announcement.createdAt)}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="admin-item-actions">
+                            <button class="admin-button admin-button-secondary" style="padding: 0.5rem;" onclick="editAnnouncement(${announcement.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="admin-button admin-button-danger" style="padding: 0.5rem;" onclick="deleteAnnouncement(${announcement.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="admin-item-actions">
-                        <button class="admin-button admin-button-secondary" style="padding: 0.5rem;" onclick="editAnnouncement(${announcement.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="admin-button admin-button-danger" style="padding: 0.5rem;" onclick="deleteAnnouncement(${announcement.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('')}
+        `;
     }
 }
 
 function renderNews() {
     const newsList = document.getElementById('news-list');
     if (newsList) {
-        newsList.innerHTML = adminData.news.map(article => `
-            <div class="admin-item">
-                <div class="admin-item-header">
-                    <div>
-                        <h4 class="admin-item-title">${article.title}</h4>
-                        <p class="admin-item-content">${article.excerpt}</p>
-                        <div style="margin-top: 0.5rem;">
-                            ${article.published ? 
-                                '<span class="admin-badge admin-badge-success"><i class="fas fa-eye"></i> Published</span>' : 
-                                '<span class="admin-badge admin-badge-secondary"><i class="fas fa-eye-slash"></i> Draft</span>'
-                            }
-                            <span style="font-size: 0.75rem; color: #6b7280; margin-left: 0.5rem;">
-                                ${new Date(article.createdAt).toLocaleDateString()}
-                            </span>
+        // Sort news based on current sort order
+        const sortedNews = sortItems([...adminData.news], adminData.sortOrder.news);
+        
+        newsList.innerHTML = `
+            <div class="admin-sort-controls">
+                <label class="admin-label">Sort by:</label>
+                <select class="admin-input" style="width: auto; display: inline-block; margin-left: 0.5rem;" onchange="changeSortOrder('news', this.value)">
+                    <option value="date-desc" ${adminData.sortOrder.news === 'date-desc' ? 'selected' : ''}>Newest First</option>
+                    <option value="date-asc" ${adminData.sortOrder.news === 'date-asc' ? 'selected' : ''}>Oldest First</option>
+                    <option value="title-asc" ${adminData.sortOrder.news === 'title-asc' ? 'selected' : ''}>Title A-Z</option>
+                    <option value="title-desc" ${adminData.sortOrder.news === 'title-desc' ? 'selected' : ''}>Title Z-A</option>
+                    <option value="status" ${adminData.sortOrder.news === 'status' ? 'selected' : ''}>Published First</option>
+                </select>
+            </div>
+            ${sortedNews.map(article => `
+                <div class="admin-item">
+                    <div class="admin-item-header">
+                        <div>
+                            <h4 class="admin-item-title">${article.title}</h4>
+                            <p class="admin-item-content">${article.excerpt || article.content?.substring(0, 150) + '...'}</p>
+                            <div style="margin-top: 0.5rem;">
+                                ${article.published ? 
+                                    '<span class="admin-badge admin-badge-success"><i class="fas fa-eye"></i> Published</span>' : 
+                                    '<span class="admin-badge admin-badge-secondary"><i class="fas fa-eye-slash"></i> Draft</span>'
+                                }
+                                <span style="font-size: 0.75rem; color: #6b7280; margin-left: 0.5rem;">
+                                    Created: ${formatDate(article.created_at || article.createdAt)}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="admin-item-actions">
+                            <button class="admin-button admin-button-secondary" style="padding: 0.5rem;" onclick="editNews(${article.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="admin-button admin-button-danger" style="padding: 0.5rem;" onclick="deleteNews(${article.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="admin-item-actions">
-                        <button class="admin-button admin-button-secondary" style="padding: 0.5rem;" onclick="editNews(${article.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="admin-button admin-button-danger" style="padding: 0.5rem;" onclick="deleteNews(${article.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('')}
+        `;
     }
 }
 
@@ -531,5 +569,59 @@ async function deleteNews(id) {
         loadAdminData();
     } catch (error) {
         alert('Error: ' + error.message);
+    }
+}
+
+// Utility Functions for Sorting and Date Formatting
+function formatDate(dateString) {
+    if (!dateString) return 'Unknown';
+    
+    const date = new Date(dateString);
+    const options = { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    
+    return date.toLocaleDateString('de-DE', options);
+}
+
+function sortItems(items, sortOrder) {
+    return items.sort((a, b) => {
+        switch(sortOrder) {
+            case 'date-desc':
+                return new Date(b.created_at || b.createdAt) - new Date(a.created_at || a.createdAt);
+            case 'date-asc':
+                return new Date(a.created_at || a.createdAt) - new Date(b.created_at || b.createdAt);
+            case 'title-asc':
+                return a.title.localeCompare(b.title);
+            case 'title-desc':
+                return b.title.localeCompare(a.title);
+            case 'type-asc':
+                return a.type ? a.type.localeCompare(b.type) : 0;
+            case 'status':
+                // For announcements: active first, for news: published first
+                if (a.active !== undefined) {
+                    return b.active - a.active;
+                } else if (a.published !== undefined) {
+                    return b.published - a.published;
+                }
+                return 0;
+            default:
+                return 0;
+        }
+    });
+}
+
+function changeSortOrder(type, newOrder) {
+    adminData.sortOrder[type] = newOrder;
+    
+    // Re-render the appropriate section
+    if (type === 'announcements') {
+        renderAnnouncements();
+    } else if (type === 'news') {
+        renderNews();
     }
 }

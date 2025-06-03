@@ -448,6 +448,41 @@ body {
     gap: 0.5rem;
 }
 
+/* Sort Controls */
+.admin-sort-controls {
+    background: #f8f9fa;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-sort-controls .admin-label {
+    margin: 0;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.admin-sort-controls .admin-input {
+    margin: 0;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    min-width: 180px;
+    background: white;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.admin-sort-controls .admin-input:focus {
+    outline: none;
+    border-color: var(--brand-orange);
+    box-shadow: 0 0 0 2px rgba(255, 145, 36, 0.2);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .admin-grid {
@@ -466,5 +501,16 @@ body {
         flex-direction: column;
         gap: 1rem;
         align-items: flex-start;
+    }
+
+    .admin-sort-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .admin-sort-controls .admin-input {
+        width: 100%;
+        min-width: auto;
     }
 }

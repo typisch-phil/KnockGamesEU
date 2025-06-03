@@ -43,12 +43,7 @@ if (strpos($requestUri, '/api/') === 0) {
 
 // Admin-Routen
 if ($requestUri === '/admin' || $requestUri === '/admin/') {
-    require_once 'admin/index.html';
-    return;
-}
-
-if ($requestUri === '/admin/mysql-setup' || $requestUri === '/admin/mysql-setup/') {
-    require_once 'admin/mysql-setup.html';
+    require_once 'admin/index.php';
     return;
 }
 

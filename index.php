@@ -379,6 +379,69 @@ if ($db->isConnected()) {
             }
         }
 
+        /* Server Status Widget */
+        .server-status-widget {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 145, 36, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .server-status-widget:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 145, 36, 0.2);
+        }
+
+        .server-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .server-icon {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 0 10px rgba(255, 145, 36, 0.5));
+        }
+
+        .server-details h3 {
+            color: #ff9124;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .status-online {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .status-offline {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .status-loading {
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .server-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: rgba(255, 145, 36, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2.5rem;
@@ -440,6 +503,18 @@ if ($db->isConnected()) {
                 <h1>KnockGames.eu</h1>
                 <p>Das ultimative Minecraft Training Network</p>
                 <p>Verbessere deine PvP-Fähigkeiten mit professionellen Trainingsmodulen</p>
+                
+                <!-- Server Status Widget -->
+                <div class="server-status-widget" id="serverStatus">
+                    <div class="server-info">
+                        <div class="server-icon">🎮</div>
+                        <div class="server-details">
+                            <h3>Server Status</h3>
+                            <div class="status-loading">Lade Server-Status...</div>
+                        </div>
+                    </div>
+                </div>
+                
                 <a href="#training" class="cta-button">Jetzt trainieren</a>
             </section>
 
@@ -668,7 +743,48 @@ if ($db->isConnected()) {
                     e.stopPropagation();
                 }
             });
+
+            // Server Status laden
+            loadServerStatus();
+            
+            // Server Status alle 30 Sekunden aktualisieren
+            setInterval(loadServerStatus, 30000);
         });
+
+        // Server Status Abfrage
+        async function loadServerStatus() {
+            const statusWidget = document.getElementById('serverStatus');
+            if (!statusWidget) return;
+
+            const statusDiv = statusWidget.querySelector('.status-loading') || 
+                             statusWidget.querySelector('.status-online') || 
+                             statusWidget.querySelector('.status-offline');
+
+            try {
+                // Lade Server Status von API
+                const response = await fetch('/api/minecraft/status?host=knockgames.eu');
+                const data = await response.json();
+
+                if (data.online) {
+                    statusDiv.className = 'status-online';
+                    statusDiv.innerHTML = `
+                        ✓ Server Online
+                        <div class="server-stats">
+                            <span class="stat-item">👥 ${data.players.online}/${data.players.max} Spieler</span>
+                            <span class="stat-item">📋 ${data.version}</span>
+                            ${data.ping ? `<span class="stat-item">⚡ ${data.ping}ms</span>` : ''}
+                        </div>
+                    `;
+                } else {
+                    statusDiv.className = 'status-offline';
+                    statusDiv.innerHTML = '✗ Server Offline';
+                }
+            } catch (error) {
+                console.error('Fehler beim Laden des Server Status:', error);
+                statusDiv.className = 'status-offline';
+                statusDiv.innerHTML = '✗ Status nicht verfügbar';
+            }
+        }
     </script>
 </body>
 </html>

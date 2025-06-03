@@ -1010,6 +1010,7 @@ if ($db->isConnected()) {
 
             // Fallback für Demo-Zwecke - zeigt statische Informationen
             // Für echte Server-Daten benötigen wir externe API-Schlüssel oder Server-Zugang
+            /*
             if (statusTile) {
                 statusTile.className = 'tile-value status-online';
                 statusTile.textContent = 'Online';
@@ -1023,11 +1024,11 @@ if ($db->isConnected()) {
             if (serverVersionElement) {
                 serverVersionElement.textContent = '1.20.4';
             }
-
+            */
             // Kommentiert aus wegen API-Fehlern - kann mit echtem Server reaktiviert werden
-            /*
+            
             try {
-                const response = await fetch('/minecraft-status.php?host=knockgames.eu');
+                const response = await fetch('/minecraft-status.php?host=77.90.15.172&port=25565');
                 const data = await response.json();
 
                 if (data.online) {
@@ -1040,7 +1041,7 @@ if ($db->isConnected()) {
                     }
 
                     if (serverVersionElement) {
-                        serverVersionElement.textContent = data.version || '1.20+';
+                        serverVersionElement.textContent = data.version || '1.8+';
                     }
                 } else {
                     statusTile.className = 'tile-value status-offline';
@@ -1068,7 +1069,7 @@ if ($db->isConnected()) {
                     serverVersionElement.textContent = '-';
                 }
             }
-            */
+            
         }
 
         // Server IP kopieren Funktionalität

@@ -580,75 +580,94 @@ if ($db->isConnected()) {
         function openModal(type, index) {
             const modal = document.getElementById('contentModal');
             const modalTitle = document.getElementById('modalTitle');
-            const modalType = document.getElementById('modalType');
-            const modalDate = document.getElementById('modalDate');
             const modalText = document.getElementById('modalText');
             const modalMeta = document.getElementById('modalMeta');
 
-            let content = null;
+            // Überprüfe, ob alle Elemente gefunden wurden
+            if (!modal || !modalTitle || !modalText || !modalMeta) {
+                console.error('Modal-Elemente nicht gefunden');
+                return;
+            }
 
-            if (type === 'announcement' && announcements[index]) {
+            let content = null;
+            let typeText = '';
+
+            if (type === 'announcement' && announcements && announcements[index]) {
                 content = announcements[index];
-                modalType.textContent = content.type.charAt(0).toUpperCase() + content.type.slice(1);
+                typeText = content.type ? content.type.charAt(0).toUpperCase() + content.type.slice(1) : 'Ankündigung';
                 modalMeta.innerHTML = `
-                    <strong>Typ:</strong> <span style="color: #ff9124;">${modalType.textContent}</span><br>
+                    <strong>Typ:</strong> <span style="color: #ff9124;">${typeText}</span><br>
                     <strong>Erstellt:</strong> ${formatDate(content.created_at)}
                 `;
-            } else if (type === 'news' && news[index]) {
+            } else if (type === 'news' && news && news[index]) {
                 content = news[index];
-                modalType.textContent = 'News';
+                typeText = 'News Artikel';
                 modalMeta.innerHTML = `
-                    <strong>Typ:</strong> <span style="color: #ff9124;">News Artikel</span><br>
+                    <strong>Typ:</strong> <span style="color: #ff9124;">${typeText}</span><br>
                     <strong>Erstellt:</strong> ${formatDate(content.created_at)}
                 `;
             }
 
-            if (content) {
+            if (content && content.title && content.content) {
                 modalTitle.textContent = content.title;
                 modalText.textContent = content.content;
                 modal.classList.add('show');
-                document.body.style.overflow = 'hidden'; // Verhindere Scrollen im Hintergrund
+                document.body.style.overflow = 'hidden';
+            } else {
+                console.error('Inhalt nicht gefunden:', type, index);
             }
         }
 
         function closeModal() {
             const modal = document.getElementById('contentModal');
-            modal.classList.remove('show');
-            document.body.style.overflow = 'auto'; // Erlaube wieder Scrollen
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
         }
-
-        // Modal schließen bei Klick außerhalb
-        document.getElementById('contentModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-
-        // Modal schließen mit Escape-Taste
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-        });
 
         // Datum formatieren
         function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('de-DE', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('de-DE', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return 'Datum nicht verfügbar';
+            }
         }
 
-        // Verhindere Propagation bei "Vollständig lesen" Button
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('read-more-btn')) {
-                e.preventDefault();
-                e.stopPropagation();
+        // Event Listeners nach DOM Load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modal schließen bei Klick außerhalb
+            const modal = document.getElementById('contentModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
             }
+
+            // Modal schließen mit Escape-Taste
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+
+            // Verhindere Propagation bei "Vollständig lesen" Button
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('read-more-btn')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
         });
     </script>
 </body>

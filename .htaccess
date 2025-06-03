@@ -4,16 +4,16 @@ RewriteEngine On
 RewriteRule ^api/(.*)$ api.php [QSA,L]
 
 # Admin-Verzeichnis
-RewriteRule ^admin/?$ admin/index.html [L]
-RewriteRule ^admin/mysql-setup/?$ admin/mysql-setup.html [L]
+RewriteRule ^admin/?$ admin/index.php [L]
+RewriteRule ^admin/mysql-setup/?$ admin/mysql-setup.php [L]
 
 # Hauptseite
-RewriteRule ^$ index.html [L]
+RewriteRule ^$ index.php [L]
 
 # PHP-Dateien direkt ausführen
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.html [L]
+RewriteRule ^(.*)$ index.php [L]
 
 # Sicherheit
 <Files "config.php">

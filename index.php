@@ -142,20 +142,54 @@ if ($db->isConnected()) {
 
         .cta-button {
             display: inline-block;
-            background: linear-gradient(45deg, #ff9124, #ff7700);
-            color: #000;
+            background: linear-gradient(135deg, #ff9124 0%, #e67e0e 100%);
+            color: #fff;
             padding: 1rem 2rem;
             text-decoration: none;
+            border: none;
             border-radius: 50px;
             font-weight: bold;
             font-size: 1.1rem;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(255, 145, 36, 0.3);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
         }
 
         .cta-button:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(255, 145, 36, 0.5);
+        }
+
+        .cta-button:active {
+            transform: translateY(-1px);
+        }
+
+        .copy-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            animation: copy-feedback 0.3s ease;
+        }
+
+        @keyframes copy-feedback {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         .section {
@@ -381,65 +415,159 @@ if ($db->isConnected()) {
 
         /* Server Status Widget */
         .server-status-widget {
-            background: rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(255, 145, 36, 0.15) 0%, rgba(255, 145, 36, 0.05) 100%);
             backdrop-filter: blur(20px);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin: 2rem 0;
-            border: 1px solid rgba(255, 145, 36, 0.3);
-            transition: all 0.3s ease;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2.5rem 0;
+            border: 2px solid rgba(255, 145, 36, 0.4);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(255, 145, 36, 0.1);
+        }
+
+        .server-status-widget::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 145, 36, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .server-status-widget:hover::before {
+            left: 100%;
         }
 
         .server-status-widget:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 145, 36, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(255, 145, 36, 0.2);
+            border-color: rgba(255, 145, 36, 0.6);
         }
 
         .server-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 2;
         }
 
         .server-icon {
-            font-size: 2.5rem;
-            filter: drop-shadow(0 0 10px rgba(255, 145, 36, 0.5));
+            font-size: 3rem;
+            filter: drop-shadow(0 0 15px rgba(255, 145, 36, 0.7));
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(255, 145, 36, 0.7)); }
+            50% { filter: drop-shadow(0 0 25px rgba(255, 145, 36, 0.9)); }
+        }
+
+        .server-details {
+            flex: 1;
         }
 
         .server-details h3 {
             color: #ff9124;
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 145, 36, 0.3);
         }
 
         .status-online {
             color: #28a745;
             font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-online::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #28a745;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #28a745;
+            animation: status-pulse 1.5s infinite;
+        }
+
+        @keyframes status-pulse {
+            0%, 100% { box-shadow: 0 0 10px #28a745; }
+            50% { box-shadow: 0 0 20px #28a745, 0 0 30px #28a745; }
         }
 
         .status-offline {
             color: #dc3545;
             font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-offline::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #dc3545;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #dc3545;
         }
 
         .status-loading {
             color: #ffc107;
             font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-loading::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #ffc107;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffc107;
+            animation: loading-spin 1s linear infinite;
+        }
+
+        @keyframes loading-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .server-stats {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
         }
 
         .stat-item {
-            background: rgba(255, 145, 36, 0.2);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            background: linear-gradient(135deg, rgba(255, 145, 36, 0.3) 0%, rgba(255, 145, 36, 0.1) 100%);
+            border: 1px solid rgba(255, 145, 36, 0.4);
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(255, 145, 36, 0.4) 0%, rgba(255, 145, 36, 0.2) 100%);
+            box-shadow: 0 5px 15px rgba(255, 145, 36, 0.2);
         }
 
         @media (max-width: 768px) {
@@ -515,7 +643,7 @@ if ($db->isConnected()) {
                     </div>
                 </div>
                 
-                <a href="#training" class="cta-button">Jetzt trainieren</a>
+                <button class="cta-button" onclick="copyServerIP()">Server IP Kopieren</button>
             </section>
 
             <?php if (!empty($announcements)): ?>
@@ -768,7 +896,7 @@ if ($db->isConnected()) {
                 if (data.online) {
                     statusDiv.className = 'status-online';
                     statusDiv.innerHTML = `
-                        ✓ Server Online
+                        Server Online
                         <div class="server-stats">
                             <span class="stat-item">👥 ${data.players.online}/${data.players.max} Spieler</span>
                             <span class="stat-item">📋 ${data.version}</span>
@@ -777,12 +905,51 @@ if ($db->isConnected()) {
                     `;
                 } else {
                     statusDiv.className = 'status-offline';
-                    statusDiv.innerHTML = '✗ Server Offline';
+                    statusDiv.innerHTML = 'Server Offline';
                 }
             } catch (error) {
                 console.error('Fehler beim Laden des Server Status:', error);
                 statusDiv.className = 'status-offline';
-                statusDiv.innerHTML = '✗ Status nicht verfügbar';
+                statusDiv.innerHTML = 'Status nicht verfügbar';
+            }
+        }
+
+        // Server IP kopieren Funktionalität
+        async function copyServerIP() {
+            const serverIP = 'knockgames.eu';
+            const button = event.target;
+            const originalText = button.textContent;
+
+            try {
+                await navigator.clipboard.writeText(serverIP);
+                
+                // Erfolgsfeedback
+                button.classList.add('copy-success');
+                button.textContent = '✓ IP Kopiert!';
+                
+                // Button nach 2 Sekunden zurücksetzen
+                setTimeout(() => {
+                    button.classList.remove('copy-success');
+                    button.textContent = originalText;
+                }, 2000);
+                
+            } catch (err) {
+                // Fallback für ältere Browser
+                const textArea = document.createElement('textarea');
+                textArea.value = serverIP;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Erfolgsfeedback
+                button.classList.add('copy-success');
+                button.textContent = '✓ IP Kopiert!';
+                
+                setTimeout(() => {
+                    button.classList.remove('copy-success');
+                    button.textContent = originalText;
+                }, 2000);
             }
         }
     </script>

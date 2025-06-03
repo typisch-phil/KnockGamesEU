@@ -202,7 +202,7 @@ app.get('/api/training-programs', async (req, res) => {
 // Server status endpoint
 app.get('/api/server-status', async (req, res) => {
   try {
-    const { host = 'play.knockgames.eu', port = 25565 } = req.query;
+    const { host = 'knockgames.eu', port = 25565 } = req.query;
     
     // For demo purposes, return a static response
     const status = {

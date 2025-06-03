@@ -40,7 +40,7 @@ body {
     align-items: center;
     min-height: 100vh;
     padding: 2rem;
-    background: linear-gradient(135deg, #ff9124 0%, #ff6b35 50%, #f7931e 100%);
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     position: relative;
 }
 
@@ -56,15 +56,15 @@ body {
 }
 
 .login-box {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     padding: 3rem;
     border-radius: 20px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 25px 50px rgba(255, 145, 36, 0.3);
     width: 100%;
     max-width: 420px;
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 145, 36, 0.4);
 }
 
 .login-box .logo {
@@ -73,15 +73,15 @@ body {
 }
 
 .login-box .logo h1 {
-    color: var(--primary-color);
+    color: #ff9124;
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 0 20px rgba(255, 145, 36, 0.5);
 }
 
 .login-box .logo p {
-    color: #666;
+    color: rgba(255, 255, 255, 0.8);
     font-size: 1.1rem;
     font-weight: 500;
 }
@@ -93,7 +93,7 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #333;
+    color: rgba(255, 255, 255, 0.9);
     font-weight: 600;
     font-size: 0.95rem;
 }
@@ -101,20 +101,25 @@ body {
 .form-group input {
     width: 100%;
     padding: 1rem 1.2rem;
-    border: 2px solid #e9ecef;
+    border: 2px solid rgba(255, 145, 36, 0.3);
     border-radius: var(--border-radius);
     font-size: 1rem;
-    background: #fff;
-    color: #333;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
     transition: var(--transition);
     font-family: inherit;
 }
 
 .form-group input:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(255, 145, 36, 0.1);
+    border-color: #ff9124;
+    box-shadow: 0 0 0 3px rgba(255, 145, 36, 0.3);
+    background: rgba(255, 255, 255, 0.15);
     transform: translateY(-1px);
+}
+
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .btn {
@@ -149,17 +154,20 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, #ff9124 0%, #ff7a00 100%);
     color: white;
     width: 100%;
     font-size: 1.1rem;
     padding: 1.2rem 2rem;
     margin-top: 1rem;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 15px rgba(255, 145, 36, 0.4);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(255, 145, 36, 0.3);
+    box-shadow: 0 10px 30px rgba(255, 145, 36, 0.5);
+    background: linear-gradient(135deg, #ff7a00 0%, #ff6500 100%);
 }
 
 .btn-secondary {
@@ -172,33 +180,36 @@ body {
     padding: 1.5rem;
     background: rgba(255, 145, 36, 0.1);
     border-radius: var(--border-radius);
-    border-left: 4px solid var(--primary-color);
+    border: 1px solid rgba(255, 145, 36, 0.3);
+    text-align: center;
 }
 
 .demo-credentials p {
-    color: #666;
+    color: rgba(255, 255, 255, 0.9);
     font-size: 0.9rem;
     line-height: 1.4;
+    margin: 0.5rem 0;
 }
 
 .demo-credentials p:first-child {
+    color: #ff9124;
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 /* Admin Container */
 .admin-container {
     display: flex;
     min-height: 100vh;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
 }
 
 /* Sidebar */
 .admin-sidebar {
     width: var(--sidebar-width);
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 2px solid rgba(255, 145, 36, 0.3);
     padding: 0;
     position: fixed;
     height: 100vh;
@@ -208,15 +219,16 @@ body {
 
 .sidebar-header {
     padding: 2rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 145, 36, 0.1);
+    border-bottom: 2px solid rgba(255, 145, 36, 0.3);
+    background: rgba(255, 145, 36, 0.15);
 }
 
 .sidebar-header h2 {
-    color: var(--primary-color);
+    color: #ff9124;
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 0.25rem;
+    text-shadow: 0 0 10px rgba(255, 145, 36, 0.3);
 }
 
 .sidebar-header p {
@@ -246,10 +258,11 @@ body {
 
 .nav-link:hover,
 .nav-link.active {
-    background: rgba(255, 145, 36, 0.1);
-    color: var(--primary-color);
-    border-left-color: var(--primary-color);
+    background: rgba(255, 145, 36, 0.2);
+    color: #ff9124;
+    border-left-color: #ff9124;
     transform: translateX(5px);
+    box-shadow: 0 0 15px rgba(255, 145, 36, 0.2);
 }
 
 .nav-link.logout {
@@ -276,7 +289,7 @@ body {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px);
     padding: 1.5rem 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid rgba(255, 145, 36, 0.3);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -316,7 +329,7 @@ body {
 }
 
 .user-info strong {
-    color: var(--primary-color);
+    color: #ff9124;
 }
 
 /* Content Area */
@@ -355,11 +368,11 @@ body {
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px);
     padding: 1.5rem;
     border-radius: var(--border-radius);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 145, 36, 0.3);
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -368,8 +381,9 @@ body {
 
 .stat-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 15px 40px rgba(255, 145, 36, 0.2);
+    background: rgba(255, 145, 36, 0.1);
+    border-color: rgba(255, 145, 36, 0.5);
 }
 
 .stat-icon {
@@ -379,9 +393,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--primary-color);
+    background: linear-gradient(135deg, #ff9124, #ff7a00);
     border-radius: 50%;
     color: white;
+    box-shadow: 0 0 20px rgba(255, 145, 36, 0.4);
 }
 
 .stat-info h3 {

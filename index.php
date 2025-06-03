@@ -245,6 +245,140 @@ if ($db->isConnected()) {
             box-shadow: 0 6px 20px rgba(255, 145, 36, 0.5);
         }
 
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 2px solid #ff9124;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(255, 145, 36, 0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #ff9124 0%, #e67e0e 100%);
+            color: #fff;
+            padding: 1.5rem 2rem;
+            border-radius: 13px 13px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .modal-meta {
+            background: rgba(255, 145, 36, 0.1);
+            border-left: 4px solid #ff9124;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .modal-content-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            white-space: pre-wrap;
+        }
+
+        .read-more-btn {
+            background: linear-gradient(135deg, #ff9124 0%, #e67e0e 100%);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .read-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 145, 36, 0.4);
+        }
+
+        .card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 145, 36, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2.5rem;
@@ -262,6 +396,23 @@ if ($db->isConnected()) {
             .header-content {
                 flex-direction: column;
                 gap: 1rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+            }
+
+            .modal-header {
+                padding: 1rem 1.5rem;
+            }
+
+            .modal-title {
+                font-size: 1.2rem;
+            }
+
+            .modal-body {
+                padding: 1.5rem;
             }
         }
     </style>
@@ -296,13 +447,14 @@ if ($db->isConnected()) {
             <section class="section" id="announcements">
                 <h2>📢 Aktuelle Ankündigungen</h2>
                 <div class="cards">
-                    <?php foreach ($announcements as $announcement): ?>
-                    <div class="card">
+                    <?php foreach ($announcements as $index => $announcement): ?>
+                    <div class="card" onclick="openModal('announcement', <?= $index ?>)">
                         <div class="card-type type-<?= htmlspecialchars($announcement['type']) ?>">
                             <?= ucfirst(htmlspecialchars($announcement['type'])) ?>
                         </div>
                         <h3><?= htmlspecialchars($announcement['title']) ?></h3>
-                        <p><?= htmlspecialchars($announcement['content']) ?></p>
+                        <p><?= htmlspecialchars(substr($announcement['content'], 0, 150)) ?><?= strlen($announcement['content']) > 150 ? '...' : '' ?></p>
+                        <button class="read-more-btn">Vollständig lesen</button>
                         <div class="date">
                             Erstellt: <?= date('d.m.Y H:i', strtotime($announcement['created_at'])) ?>
                         </div>
@@ -334,10 +486,11 @@ if ($db->isConnected()) {
             <section class="section" id="news">
                 <h2>📰 Neueste News</h2>
                 <div class="cards">
-                    <?php foreach ($news as $article): ?>
-                    <div class="card">
+                    <?php foreach ($news as $index => $article): ?>
+                    <div class="card" onclick="openModal('news', <?= $index ?>)">
                         <h3><?= htmlspecialchars($article['title']) ?></h3>
-                        <p><?= htmlspecialchars($article['excerpt'] ?? substr($article['content'], 0, 150) . '...') ?></p>
+                        <p><?= htmlspecialchars(substr($article['content'], 0, 150)) ?><?= strlen($article['content']) > 150 ? '...' : '' ?></p>
+                        <button class="read-more-btn">Vollständig lesen</button>
                         <div class="date">
                             Erstellt: <?= date('d.m.Y H:i', strtotime($article['created_at'])) ?>
                         </div>
@@ -376,6 +529,25 @@ if ($db->isConnected()) {
 
     <a href="/admin" class="admin-link">Admin</a>
 
+    <!-- Modal für Ankündigungen und News -->
+    <div id="contentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Titel</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-meta" id="modalMeta">
+                    <strong>Typ:</strong> <span id="modalType"></span><br>
+                    <strong>Erstellt:</strong> <span id="modalDate"></span>
+                </div>
+                <div class="modal-content-text" id="modalText">
+                    Inhalt wird geladen...
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Smooth scrolling für Navigation
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -398,6 +570,104 @@ if ($db->isConnected()) {
             if (hero) {
                 hero.style.transform = `translateY(${scrolled * 0.5}px)`;
             }
+        });
+
+        // Daten für Modal
+        const announcements = <?= json_encode($announcements) ?>;
+        const news = <?= json_encode($news) ?>;
+
+        // Modal-Funktionen
+        function openModal(type, index) {
+            const modal = document.getElementById('contentModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalText = document.getElementById('modalText');
+            const modalMeta = document.getElementById('modalMeta');
+
+            // Überprüfe, ob alle Elemente gefunden wurden
+            if (!modal || !modalTitle || !modalText || !modalMeta) {
+                console.error('Modal-Elemente nicht gefunden');
+                return;
+            }
+
+            let content = null;
+            let typeText = '';
+
+            if (type === 'announcement' && announcements && announcements[index]) {
+                content = announcements[index];
+                typeText = content.type ? content.type.charAt(0).toUpperCase() + content.type.slice(1) : 'Ankündigung';
+                modalMeta.innerHTML = `
+                    <strong>Typ:</strong> <span style="color: #ff9124;">${typeText}</span><br>
+                    <strong>Erstellt:</strong> ${formatDate(content.created_at)}
+                `;
+            } else if (type === 'news' && news && news[index]) {
+                content = news[index];
+                typeText = 'News Artikel';
+                modalMeta.innerHTML = `
+                    <strong>Typ:</strong> <span style="color: #ff9124;">${typeText}</span><br>
+                    <strong>Erstellt:</strong> ${formatDate(content.created_at)}
+                `;
+            }
+
+            if (content && content.title && content.content) {
+                modalTitle.textContent = content.title;
+                modalText.textContent = content.content;
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            } else {
+                console.error('Inhalt nicht gefunden:', type, index);
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('contentModal');
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Datum formatieren
+        function formatDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('de-DE', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return 'Datum nicht verfügbar';
+            }
+        }
+
+        // Event Listeners nach DOM Load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modal schließen bei Klick außerhalb
+            const modal = document.getElementById('contentModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
+            }
+
+            // Modal schließen mit Escape-Taste
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+
+            // Verhindere Propagation bei "Vollständig lesen" Button
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('read-more-btn')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
         });
     </script>
 </body>

@@ -126,6 +126,9 @@ if ($db->isConnected()) {
             <header class="admin-header">
                 <h1 id="page-title">Dashboard</h1>
                 <div class="header-actions">
+                    <a href="/" class="btn btn-secondary" style="margin-right: 1rem;">
+                        <i class="fas fa-home"></i> Zurück zur Homepage
+                    </a>
                     <span class="user-info">Angemeldet als: <strong><?= htmlspecialchars($_SESSION['admin_username']) ?></strong></span>
                 </div>
             </header>
@@ -284,6 +287,7 @@ if ($db->isConnected()) {
                                 <tr>
                                     <th onclick="sortNews('id')">ID ↕️</th>
                                     <th onclick="sortNews('title')">Titel ↕️</th>
+                                    <th onclick="sortNews('excerpt')">Inhalt ↕️</th>
                                     <th onclick="sortNews('published')">Status ↕️</th>
                                     <th onclick="sortNews('created_at')">Erstellt ↕️</th>
                                     <th>Aktionen</th>
@@ -299,10 +303,124 @@ if ($db->isConnected()) {
         </main>
     </div>
     
-    <!-- Modals werden via JavaScript erstellt -->
-    <div id="modal-container"></div>
+    <!-- CRUD Modals -->
+    
+    <!-- Benutzer Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="userModalTitle">Neuer Benutzer</h3>
+                <button class="modal-close" onclick="closeUserModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <div class="form-group">
+                        <label>Benutzername *</label>
+                        <input type="text" id="userUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Passwort *</label>
+                        <input type="password" id="userPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>E-Mail</label>
+                        <input type="email" id="userEmail">
+                    </div>
+                    <div class="form-group">
+                        <label>Rolle</label>
+                        <select id="userRole">
+                            <option value="user">Benutzer</option>
+                            <option value="moderator">Moderator</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="saveUser()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ankündigung Modal -->
+    <div id="announcementModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="announcementModalTitle">Neue Ankündigung</h3>
+                <button class="modal-close" onclick="closeAnnouncementModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="announcementForm">
+                    <div class="form-group">
+                        <label>Titel *</label>
+                        <input type="text" id="announcementTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Typ</label>
+                        <select id="announcementType">
+                            <option value="info">Info</option>
+                            <option value="success">Erfolg</option>
+                            <option value="warning">Warnung</option>
+                            <option value="error">Fehler</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Inhalt *</label>
+                        <textarea id="announcementContent" rows="5" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="announcementActive" checked>
+                            Aktiv
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeAnnouncementModal()">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="saveAnnouncement()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- News Modal -->
+    <div id="newsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="newsModalTitle">Neuer Artikel</h3>
+                <button class="modal-close" onclick="closeNewsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newsForm">
+                    <div class="form-group">
+                        <label>Titel *</label>
+                        <input type="text" id="newsTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kurzbeschreibung</label>
+                        <textarea id="newsExcerpt" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Inhalt *</label>
+                        <textarea id="newsContent" rows="8" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="newsPublished" checked>
+                            Veröffentlicht
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeNewsModal()">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="saveNews()">Speichern</button>
+            </div>
+        </div>
+    </div>
     <?php endif; ?>
     
-    <script src="/admin/admin.js"></script>
+    <script src="/admin/admin-clean.js"></script>
 </body>
 </html>

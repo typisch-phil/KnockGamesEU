@@ -1,5 +1,5 @@
 import { Box } from "lucide-react";
-import { SiDiscord, SiYoutube, SiTwitter } from "react-icons/si";
+import { SiDiscord, SiYoutube, SiX } from "react-icons/si";
 
 export default function Footer() {
   const footerSections = [
@@ -20,7 +20,7 @@ export default function Footer() {
   const socialLinks = [
     { icon: SiDiscord, href: "#" },
     { icon: SiYoutube, href: "#" },
-    { icon: SiTwitter, href: "#" },
+    { icon: SiX, href: "#" },
   ];
 
   return (

@@ -154,17 +154,20 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, #ff9124 0%, #ff7a00 100%);
     color: white;
     width: 100%;
     font-size: 1.1rem;
     padding: 1.2rem 2rem;
     margin-top: 1rem;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 15px rgba(255, 145, 36, 0.4);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(255, 145, 36, 0.3);
+    box-shadow: 0 10px 30px rgba(255, 145, 36, 0.5);
+    background: linear-gradient(135deg, #ff7a00 0%, #ff6500 100%);
 }
 
 .btn-secondary {
@@ -390,9 +393,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--primary-color);
+    background: linear-gradient(135deg, #ff9124, #ff7a00);
     border-radius: 50%;
     color: white;
+    box-shadow: 0 0 20px rgba(255, 145, 36, 0.4);
 }
 
 .stat-info h3 {

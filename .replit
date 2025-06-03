@@ -4,7 +4,7 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["php81Extensions.pdo_pgsql"]
+packages = ["php81Extensions.pdo_pgsql", "mysql80", "php81Extensions.pdo_mysql"]
 
 [deployment]
 deploymentTarget = "autoscale"

@@ -1,25 +1,11 @@
 <?php
-// KnockGames.eu - Datenbankkonfiguration
-// PostgreSQL-Verbindung über Umgebungsvariablen
-$databaseUrl = getenv('DATABASE_URL');
-if ($databaseUrl) {
-    // Parse DATABASE_URL für PostgreSQL
-    $dbParts = parse_url($databaseUrl);
-    define('DB_HOST', $dbParts['host'] ?? 'localhost');
-    define('DB_PORT', isset($dbParts['port']) ? (int)$dbParts['port'] : 5432);
-    define('DB_NAME', isset($dbParts['path']) ? ltrim($dbParts['path'], '/') : 'postgres');
-    define('DB_USER', $dbParts['user'] ?? 'postgres');
-    define('DB_PASS', $dbParts['pass'] ?? '');
-    define('DB_TYPE', 'pgsql');
-} else {
-    // Fallback auf MySQL
-    define('DB_HOST', 'localhost');
-    define('DB_PORT', 3306);
-    define('DB_NAME', 'knockgames');
-    define('DB_USER', 'root');
-    define('DB_PASS', '');
-    define('DB_TYPE', 'mysql');
-}
+// KnockGames.eu - MySQL Datenbankkonfiguration
+define('DB_HOST', 'localhost');
+define('DB_PORT', 3306);
+define('DB_NAME', 'knockgames');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_TYPE', 'mysql');
 
 // Session Konfiguration
 define('ADMIN_USERNAME', 'admin');
@@ -36,33 +22,26 @@ class Database {
     
     private function __construct() {
         try {
-            // Verwende direkt die DATABASE_URL wenn verfügbar (für PostgreSQL)
-            $databaseUrl = getenv('DATABASE_URL');
-            if ($databaseUrl && DB_TYPE === 'pgsql') {
-                $this->connection = new PDO($databaseUrl, null, null, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES => false
-                ]);
-            } else if (DB_TYPE === 'pgsql') {
-                $dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME;
-                $this->connection = new PDO($dsn, DB_USER, DB_PASS, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES => false
-                ]);
-            } else {
-                $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
-                $this->connection = new PDO($dsn, DB_USER, DB_PASS, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES => false
-                ]);
-            }
+            // MySQL-Verbindung ohne Datenbank für Erstellung
+            $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";charset=utf8mb4";
+            $tempConnection = new PDO($dsn, DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]);
+            
+            // Erstelle Datenbank falls sie nicht existiert
+            $tempConnection->exec("CREATE DATABASE IF NOT EXISTS " . DB_NAME . " CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            
+            // Verbinde mit der spezifischen Datenbank
+            $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+            $this->connection = new PDO($dsn, DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false
+            ]);
         } catch (PDOException $e) {
-            // Fallback auf JSON-Dateien wenn Datenbank nicht verfügbar
+            // Fallback auf JSON-Dateien wenn MySQL nicht verfügbar
             $this->connection = null;
-            error_log("Database Connection failed: " . $e->getMessage());
+            error_log("MySQL Connection failed: " . $e->getMessage());
         }
     }
     
@@ -138,79 +117,44 @@ function initializeData() {
     $db = Database::getInstance();
     
     if ($db->isConnected()) {
-        // Datenbank-Tabellen erstellen falls sie nicht existieren
+        // MySQL-Tabellen erstellen falls sie nicht existieren
         $pdo = $db->getConnection();
         
-        if (DB_TYPE === 'pgsql') {
-            // PostgreSQL-Tabellen
-            $pdo->exec("CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                username VARCHAR(255) NOT NULL UNIQUE,
-                password VARCHAR(255) NOT NULL,
-                email VARCHAR(255),
-                role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('admin', 'user')),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )");
-            
-            $pdo->exec("CREATE TABLE IF NOT EXISTS announcements (
-                id SERIAL PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                content TEXT NOT NULL,
-                type VARCHAR(20) DEFAULT 'info' CHECK (type IN ('info', 'warning', 'success', 'error')),
-                active BOOLEAN DEFAULT true,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )");
-            
-            $pdo->exec("CREATE TABLE IF NOT EXISTS news_articles (
-                id SERIAL PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                content TEXT NOT NULL,
-                excerpt TEXT,
-                published BOOLEAN DEFAULT false,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )");
-        } else {
-            // MySQL-Tabellen
-            $pdo->exec("CREATE TABLE IF NOT EXISTS users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(255) NOT NULL UNIQUE,
-                password VARCHAR(255) NOT NULL,
-                email VARCHAR(255),
-                role ENUM('admin', 'user') DEFAULT 'user',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            )");
-            
-            $pdo->exec("CREATE TABLE IF NOT EXISTS announcements (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                content TEXT NOT NULL,
-                type ENUM('info', 'warning', 'success', 'error') DEFAULT 'info',
-                active BOOLEAN DEFAULT true,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            )");
-            
-            $pdo->exec("CREATE TABLE IF NOT EXISTS news_articles (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                content TEXT NOT NULL,
-                excerpt TEXT,
-                published BOOLEAN DEFAULT false,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            )");
-        }
+        // Users Tabelle
+        $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            email VARCHAR(255),
+            role ENUM('admin', 'user') DEFAULT 'user',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )");
+        
+        // Announcements Tabelle
+        $pdo->exec("CREATE TABLE IF NOT EXISTS announcements (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            title VARCHAR(255) NOT NULL,
+            content TEXT NOT NULL,
+            type ENUM('info', 'warning', 'success', 'error') DEFAULT 'info',
+            active BOOLEAN DEFAULT true,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )");
+        
+        // News Tabelle
+        $pdo->exec("CREATE TABLE IF NOT EXISTS news_articles (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            title VARCHAR(255) NOT NULL,
+            content TEXT NOT NULL,
+            excerpt TEXT,
+            published BOOLEAN DEFAULT false,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )");
         
         // Standard-Admin-Benutzer einfügen
-        if (DB_TYPE === 'pgsql') {
-            $stmt = $pdo->prepare("INSERT INTO users (username, password, role, email) VALUES (?, ?, 'admin', 'admin@knockgames.eu') ON CONFLICT (username) DO NOTHING");
-        } else {
-            $stmt = $pdo->prepare("INSERT IGNORE INTO users (username, password, role, email) VALUES (?, ?, 'admin', 'admin@knockgames.eu')");
-        }
+        $stmt = $pdo->prepare("INSERT IGNORE INTO users (username, password, role, email) VALUES (?, ?, 'admin', 'admin@knockgames.eu')");
         $stmt->execute([ADMIN_USERNAME, ADMIN_PASSWORD]);
         
         // Standard-Ankündigungen einfügen
@@ -221,13 +165,8 @@ function initializeData() {
         ];
         
         foreach ($announcements as $index => $announcement) {
-            if (DB_TYPE === 'pgsql') {
-                $stmt = $pdo->prepare("INSERT INTO announcements (title, content, type, active) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING");
-                $stmt->execute($announcement);
-            } else {
-                $stmt = $pdo->prepare("INSERT IGNORE INTO announcements (id, title, content, type, active) VALUES (?, ?, ?, ?, ?)");
-                $stmt->execute([$index + 1, ...$announcement]);
-            }
+            $stmt = $pdo->prepare("INSERT IGNORE INTO announcements (id, title, content, type, active) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$index + 1, ...$announcement]);
         }
         
         // Standard-News einfügen
@@ -238,13 +177,8 @@ function initializeData() {
         ];
         
         foreach ($news as $index => $article) {
-            if (DB_TYPE === 'pgsql') {
-                $stmt = $pdo->prepare("INSERT INTO news_articles (title, content, excerpt, published) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING");
-                $stmt->execute($article);
-            } else {
-                $stmt = $pdo->prepare("INSERT IGNORE INTO news_articles (id, title, content, excerpt, published) VALUES (?, ?, ?, ?, ?)");
-                $stmt->execute([$index + 1, ...$article]);
-            }
+            $stmt = $pdo->prepare("INSERT IGNORE INTO news_articles (id, title, content, excerpt, published) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$index + 1, ...$article]);
         }
         
         return true;

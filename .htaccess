@@ -1,0 +1,34 @@
+RewriteEngine On
+
+# API-Routen zu api.php weiterleiten
+RewriteRule ^api/(.*)$ api.php [QSA,L]
+
+# Admin-Verzeichnis
+RewriteRule ^admin/?$ admin/index.html [L]
+RewriteRule ^admin/mysql-setup/?$ admin/mysql-setup.html [L]
+
+# Hauptseite
+RewriteRule ^$ index.html [L]
+
+# PHP-Dateien direkt ausführen
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.html [L]
+
+# Sicherheit
+<Files "config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "mysql-config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# CORS Headers für API
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>

@@ -1,0 +1,10 @@
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "password": "admin123",
+    "email": "admin@knockgames.eu",
+    "role": "admin",
+    "created_at": "2025-06-03T08:55:07.355Z"
+  }
+]

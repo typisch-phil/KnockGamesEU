@@ -172,7 +172,10 @@ if ($db->isConnected()) {
         
         <main class="admin-main">
             <header class="admin-header">
-                <h1 id="page-title">Dashboard</h1>
+                <div class="header-left">
+                    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" style="display: none;">☰</button>
+                    <h1 id="page-title">Dashboard</h1>
+                </div>
                 <div class="header-actions">
                     <a href="/index.php" class="btn btn-secondary" style="margin-right: 1rem;">
                         <i class="fas fa-home"></i> Zurück zur Homepage

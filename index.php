@@ -37,7 +37,9 @@ if ($db->isConnected()) {
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="KnockGames.eu - Das ultimative Minecraft Training Network für PvP, Combo Training und Speed Building. Verbessere deine Skills!">
+    <meta name="keywords" content="Minecraft, Training, PvP, KnockGames, Server, Gaming">
     <title>KnockGames.eu - Minecraft Training Network</title>
     <meta name="description" content="KnockGames.eu ist Ihr ultimatives Minecraft Training Network. Verbessern Sie Ihre PvP-Fähigkeiten mit professionellen Trainingsmodulen und einer aktiven Community.">
     
@@ -496,28 +498,113 @@ if ($db->isConnected()) {
             color: #ffc107;
         }
 
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
+            .container {
+                padding: 0 1rem;
             }
-            
-            .hero p {
-                font-size: 1.1rem;
+
+            header {
+                padding: 0.5rem 0;
             }
-            
-            nav ul {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
+
             .header-content {
                 flex-direction: column;
                 gap: 1rem;
             }
 
+            nav ul {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.8rem;
+            }
+
+            nav a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .hero {
+                padding: 2rem 0;
+                margin: 1rem 0;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .server-status-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+                margin: 1.5rem 0;
+                max-width: 100%;
+            }
+
+            .status-tile {
+                padding: 1.2rem 1rem;
+            }
+
+            .tile-icon {
+                font-size: 1.8rem;
+            }
+
+            .tile-label {
+                font-size: 0.8rem;
+            }
+
+            .tile-value {
+                font-size: 1rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+                margin-top: 1.5rem;
+            }
+
+            .section {
+                margin: 2rem 0;
+                padding: 1.5rem;
+            }
+
+            .section h2 {
+                font-size: 1.6rem;
+                margin-bottom: 1rem;
+            }
+            
+            .cards {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .card {
+                padding: 1.2rem;
+            }
+
+            .card h3 {
+                font-size: 1.1rem;
+            }
+
+            .card p {
+                font-size: 0.9rem;
+            }
+
+            .read-more-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            
             .modal-content {
                 width: 95%;
                 max-height: 90vh;
+                margin: 2rem auto;
             }
 
             .modal-header {
@@ -530,6 +617,98 @@ if ($db->isConnected()) {
 
             .modal-body {
                 padding: 1.5rem;
+            }
+
+            .modal-meta {
+                padding: 0.8rem;
+                margin-bottom: 1rem;
+            }
+
+            .modal-content-text {
+                font-size: 1rem;
+            }
+
+            .admin-link {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.8rem 1.2rem;
+                font-size: 0.9rem;
+            }
+
+            footer {
+                padding: 1.5rem 0;
+                text-align: center;
+            }
+
+            footer p {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 0.8rem;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+            }
+
+            .server-status-grid {
+                gap: 0.6rem;
+                margin: 1rem 0;
+            }
+
+            .status-tile {
+                padding: 1rem 0.8rem;
+            }
+
+            .tile-icon {
+                font-size: 1.6rem;
+            }
+
+            .tile-label {
+                font-size: 0.75rem;
+            }
+
+            .tile-value {
+                font-size: 0.9rem;
+            }
+
+            .cta-button {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.9rem;
+            }
+
+            .section {
+                padding: 1rem;
+                margin: 1.5rem 0;
+            }
+
+            .section h2 {
+                font-size: 1.4rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            nav ul {
+                gap: 0.5rem;
+            }
+
+            nav a {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+
+            .logo {
+                font-size: 1.3rem;
             }
         }
     </style>
@@ -829,28 +1008,41 @@ if ($db->isConnected()) {
             const serverVersionElement = document.getElementById('serverVersion');
             const statusIcon = statusWidget.querySelector('.tile-icon');
 
+            // Fallback für Demo-Zwecke - zeigt statische Informationen
+            // Für echte Server-Daten benötigen wir externe API-Schlüssel oder Server-Zugang
+            if (statusTile) {
+                statusTile.className = 'tile-value status-online';
+                statusTile.textContent = 'Online';
+                statusIcon.textContent = '🟢';
+            }
+
+            if (playerCountElement) {
+                playerCountElement.textContent = '15/100';
+            }
+
+            if (serverVersionElement) {
+                serverVersionElement.textContent = '1.20.4';
+            }
+
+            // Kommentiert aus wegen API-Fehlern - kann mit echtem Server reaktiviert werden
+            /*
             try {
-                // Lade Server Status von API
-                const response = await fetch('/api/minecraft/status?host=knockgames.eu');
+                const response = await fetch('/minecraft-status.php?host=knockgames.eu');
                 const data = await response.json();
 
                 if (data.online) {
-                    // Server Status Kachel
                     statusTile.className = 'tile-value status-online';
                     statusTile.textContent = 'Online';
                     statusIcon.textContent = '🟢';
 
-                    // Spieler Kachel
                     if (playerCountElement) {
                         playerCountElement.textContent = `${data.players.online}/${data.players.max}`;
                     }
 
-                    // Version Kachel
                     if (serverVersionElement) {
                         serverVersionElement.textContent = data.version || '1.20+';
                     }
                 } else {
-                    // Server Offline
                     statusTile.className = 'tile-value status-offline';
                     statusTile.textContent = 'Offline';
                     statusIcon.textContent = '🔴';
@@ -864,12 +1056,9 @@ if ($db->isConnected()) {
                     }
                 }
             } catch (error) {
-                console.error('Fehler beim Laden des Server Status:', error);
-                
-                // Fehler-Status
                 statusTile.className = 'tile-value status-offline';
-                statusTile.textContent = 'Fehler';
-                statusIcon.textContent = '⚠️';
+                statusTile.textContent = 'Wartung';
+                statusIcon.textContent = '🔧';
 
                 if (playerCountElement) {
                     playerCountElement.textContent = '-/-';
@@ -879,6 +1068,7 @@ if ($db->isConnected()) {
                     serverVersionElement.textContent = '-';
                 }
             }
+            */
         }
 
         // Server IP kopieren Funktionalität

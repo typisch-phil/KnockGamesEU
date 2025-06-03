@@ -23,6 +23,48 @@ function initializeAdminPanel() {
         adminData.isLoggedIn = true;
         showAdminDashboard();
     }
+    
+    // Setup mobile menu
+    setupMobileMenu();
+}
+
+// Mobile Menu Setup
+function setupMobileMenu() {
+    const mobileBtn = document.querySelector('.mobile-menu-btn');
+    const sidebar = document.querySelector('.admin-sidebar');
+    
+    // Show mobile button on small screens
+    function checkMobileView() {
+        if (window.innerWidth <= 1024) {
+            if (mobileBtn) mobileBtn.style.display = 'flex';
+        } else {
+            if (mobileBtn) mobileBtn.style.display = 'none';
+            if (sidebar) sidebar.classList.remove('open');
+        }
+    }
+    
+    // Initial check
+    checkMobileView();
+    
+    // Check on resize
+    window.addEventListener('resize', checkMobileView);
+    
+    // Close sidebar when clicking outside
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 1024 && sidebar && sidebar.classList.contains('open')) {
+            if (!sidebar.contains(e.target) && !mobileBtn.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
+}
+
+// Toggle Mobile Menu
+function toggleMobileMenu() {
+    const sidebar = document.querySelector('.admin-sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('open');
+    }
 }
 
 // Admin Panel Functions

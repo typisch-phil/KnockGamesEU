@@ -782,6 +782,139 @@
             background: var(--brand-orange-dark);
         }
 
+        /* News & Announcements Section */
+        .news {
+            padding: 5rem 0;
+            background: var(--dark-secondary);
+        }
+
+        .announcements-section,
+        .news-section {
+            margin-bottom: 3rem;
+        }
+
+        .subsection-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .subsection-title i {
+            color: var(--brand-orange);
+        }
+
+        .announcements-grid,
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .announcement-card,
+        .news-card {
+            background: var(--dark-tertiary);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 145, 36, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .announcement-card:hover,
+        .news-card:hover {
+            border-color: rgba(255, 145, 36, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .announcement-header,
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .announcement-title,
+        .news-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .announcement-type {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .announcement-type.info {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+        }
+
+        .announcement-type.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+        }
+
+        .announcement-type.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+        }
+
+        .announcement-type.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        .announcement-content,
+        .news-content {
+            color: #d1d5db;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .news-excerpt {
+            color: #9ca3af;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .announcement-date,
+        .news-date {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .loading-state,
+        .error-state,
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #9ca3af;
+        }
+
+        .loading-state i {
+            font-size: 2rem;
+            color: var(--brand-orange);
+            margin-bottom: 1rem;
+        }
+
+        .error-state {
+            color: #ef4444;
+        }
+
+        .empty-state {
+            color: #6b7280;
+        }
+
 
 
         /* Responsive Design */
@@ -848,6 +981,7 @@
                 <li><a href="#home">Home</a></li>
                 <li><a href="#features">Features</a></li>
                 <li><a href="#training">Training</a></li>
+                <li><a href="#news">News</a></li>
                 <li><a href="#community">Community</a></li>
                 <li><a href="#contact">Kontakt</a></li>
             </ul>
@@ -1145,6 +1279,44 @@
                         <i class="fab fa-discord"></i>
                         Discord Beitreten
                     </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News & Announcements Section -->
+    <section class="news" id="news">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">News & Ankündigungen</h2>
+                <p class="section-subtitle">Bleib auf dem Laufenden mit den neuesten Updates und Informationen</p>
+            </div>
+            
+            <!-- Announcements -->
+            <div class="announcements-section">
+                <h3 class="subsection-title">
+                    <i class="fas fa-bullhorn"></i>
+                    Aktuelle Ankündigungen
+                </h3>
+                <div id="announcements-container" class="announcements-grid">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Lade Ankündigungen...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- News Articles -->
+            <div class="news-section">
+                <h3 class="subsection-title">
+                    <i class="fas fa-newspaper"></i>
+                    Neueste Artikel
+                </h3>
+                <div id="news-container" class="news-grid">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Lade News...</p>
+                    </div>
                 </div>
             </div>
         </div>

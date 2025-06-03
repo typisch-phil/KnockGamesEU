@@ -200,6 +200,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public endpoints for website
+  app.get("/api/announcements", async (req, res) => {
+    try {
+      const announcements = await storage.getActiveAnnouncements();
+      res.json(announcements);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch announcements" });
+    }
+  });
+
+  app.get("/api/news", async (req, res) => {
+    try {
+      const news = await storage.getPublishedNewsArticles();
+      res.json(news);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch news" });
+    }
+  });
+
+  app.get("/api/training-programs", async (req, res) => {
+    try {
+      const programs = await storage.getActiveTrainingPrograms();
+      res.json(programs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch training programs" });
+    }
+  });
+
   // Admin routes
   
   // Users management

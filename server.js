@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 app.get('/api/announcements', async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT * FROM announcements WHERE active = true ORDER BY "createdAt" DESC'
+      'SELECT * FROM announcements WHERE active = true ORDER BY created_at DESC'
     );
     res.json(result.rows);
   } catch (error) {
@@ -36,7 +36,7 @@ app.get('/api/announcements', async (req, res) => {
 app.get('/api/news', async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT * FROM news_articles WHERE published = true ORDER BY "createdAt" DESC'
+      'SELECT * FROM news_articles WHERE published = true ORDER BY created_at DESC'
     );
     res.json(result.rows);
   } catch (error) {

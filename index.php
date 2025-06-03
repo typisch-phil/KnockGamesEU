@@ -538,7 +538,7 @@ if ($db->isConnected()) {
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="/" class="logo">KnockGames.eu</a>
+                <a href="/index.php" class="logo">KnockGames.eu</a>
                 <nav>
                     <ul>
                         <li><a href="#home">Home</a></li>
@@ -670,7 +670,7 @@ if ($db->isConnected()) {
         </div>
     </footer>
 
-    <a href="/admin" class="admin-link">Admin</a>
+    <a href="/admin/index.php" class="admin-link">Admin</a>
 
     <!-- Modal für Ankündigungen und News -->
     <div id="contentModal" class="modal">

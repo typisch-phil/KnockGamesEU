@@ -8,7 +8,7 @@ startSession();
 // Logout-Handling
 if (isset($_GET['logout'])) {
     session_destroy();
-    header('Location: /admin');
+    header('Location: /admin/index.php');
     exit;
 }
 
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     }
     
     if ($loginSuccess) {
-        header('Location: /admin');
+        header('Location: /admin/index.php');
         exit;
     } else {
         $loginError = 'Ungültige Anmeldedaten';

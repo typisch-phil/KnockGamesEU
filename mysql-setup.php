@@ -13,21 +13,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'] ?? '';
         
         try {
-            $dsn = "mysql:host={$host};port={$port};charset=utf8mb4";
-            $pdo = new PDO($dsn, $user, $password, [
+            // SSL-Optionen für externe Anbieter
+            $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_TIMEOUT => 10
-            ]);
+                PDO::ATTR_TIMEOUT => 15,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            ];
             
-            // Teste Datenbankzugriff
-            if (!empty($database)) {
-                $pdo->exec("CREATE DATABASE IF NOT EXISTS {$database} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-                $pdo->exec("USE {$database}");
+            // Automatische SSL-Erkennung für externe Hosts
+            $isExternal = !in_array($host, ['localhost', '127.0.0.1', '::1']);
+            if ($isExternal) {
+                $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
             }
             
-            echo json_encode(['success' => true, 'message' => 'MySQL-Verbindung erfolgreich getestet']);
+            // Teste Verbindung ohne Datenbank
+            $dsn = "mysql:host={$host};port={$port};charset=utf8mb4";
+            if ($isExternal) {
+                $dsn .= ";sslmode=require";
+            }
+            
+            $pdo = new PDO($dsn, $user, $password, $options);
+            
+            // Teste Datenbankzugriff und Erstellung
+            if (!empty($database)) {
+                $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$database}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                
+                // Teste Zugriff auf spezifische Datenbank
+                $dbDsn = "mysql:host={$host};port={$port};dbname={$database};charset=utf8mb4";
+                if ($isExternal) {
+                    $dbDsn .= ";sslmode=require";
+                }
+                $testPdo = new PDO($dbDsn, $user, $password, $options);
+                $testPdo->query('SELECT 1');
+            }
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => 'MySQL-Verbindung erfolgreich getestet' . ($isExternal ? ' (SSL aktiviert)' : '')
+            ]);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'message' => 'Verbindungsfehler: ' . $e->getMessage()]);
+            $errorMsg = $e->getMessage();
+            
+            // Benutzerfreundliche Fehlermeldungen
+            if (strpos($errorMsg, 'Access denied') !== false) {
+                $errorMsg = 'Zugriff verweigert. Überprüfen Sie Benutzername und Passwort.';
+            } elseif (strpos($errorMsg, 'Unknown database') !== false) {
+                $errorMsg = 'Datenbank nicht gefunden. Sie wird automatisch erstellt.';
+            } elseif (strpos($errorMsg, 'Connection refused') !== false) {
+                $errorMsg = 'Verbindung verweigert. Überprüfen Sie Host und Port.';
+            } elseif (strpos($errorMsg, 'timed out') !== false) {
+                $errorMsg = 'Verbindung zeitüberschreitung. Überprüfen Sie die Netzwerkverbindung.';
+            }
+            
+            echo json_encode(['success' => false, 'message' => 'Verbindungsfehler: ' . $errorMsg]);
         }
         exit;
     }
@@ -39,14 +77,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = trim($_POST['user'] ?? '');
         $password = $_POST['password'] ?? '';
         
+        // SSL automatisch aktivieren für externe Hosts
+        $isExternal = !in_array($host, ['localhost', '127.0.0.1', '::1']);
+        
         $configContent = "<?php\n";
         $configContent .= "// KnockGames.eu - MySQL Datenbankkonfiguration\n";
+        $configContent .= "// Generiert am: " . date('Y-m-d H:i:s') . "\n\n";
         $configContent .= "define('DB_HOST', '" . addslashes($host) . "');\n";
         $configContent .= "define('DB_PORT', {$port});\n";
         $configContent .= "define('DB_NAME', '" . addslashes($database) . "');\n";
         $configContent .= "define('DB_USER', '" . addslashes($user) . "');\n";
         $configContent .= "define('DB_PASS', '" . addslashes($password) . "');\n";
         $configContent .= "define('DB_TYPE', 'mysql');\n";
+        
+        if ($isExternal) {
+            $configContent .= "define('DB_SSL', true);\n";
+            $configContent .= "define('DB_EXTERNAL', true);\n";
+        } else {
+            $configContent .= "define('DB_SSL', false);\n";
+            $configContent .= "define('DB_EXTERNAL', false);\n";
+        }
+        
+        $configContent .= "\n// Verbindungstyp: " . ($isExternal ? 'Externe Datenbank (SSL)' : 'Lokale Datenbank') . "\n";
         $configContent .= "?>";
         
         if (file_put_contents('mysql-config.php', $configContent)) {
@@ -204,6 +256,36 @@ $currentDatabase = $isConnected ? 'MySQL' : 'JSON-Dateien';
             gap: 1rem;
         }
 
+        .provider-btn {
+            background: rgba(255, 145, 36, 0.2);
+            color: #ff9124;
+            border: 1px solid #ff9124;
+            padding: 0.8rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .provider-btn:hover {
+            background: #ff9124;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .connection-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border-left: 3px solid #17a2b8;
+            display: none;
+        }
+
+        .connection-info.show {
+            display: block;
+        }
+
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -220,7 +302,17 @@ $currentDatabase = $isConnected ? 'MySQL' : 'JSON-Dateien';
     <div class="container">
         <div class="header">
             <h1>MySQL Setup</h1>
-            <p>Konfigurieren Sie Ihre MySQL-Datenbankverbindung</p>
+            <p>Konfigurieren Sie Ihre MySQL-Datenbankverbindung für KnockGames.eu</p>
+        </div>
+
+        <div class="provider-templates" style="margin-bottom: 2rem;">
+            <h3 style="color: #ff9124; margin-bottom: 1rem;">Beliebte Anbieter</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <button class="provider-btn" onclick="loadTemplate('planetscale')">PlanetScale</button>
+                <button class="provider-btn" onclick="loadTemplate('railway')">Railway</button>
+                <button class="provider-btn" onclick="loadTemplate('aws')">AWS RDS</button>
+                <button class="provider-btn" onclick="loadTemplate('digitalocean')">DigitalOcean</button>
+            </div>
         </div>
 
         <div class="status">
@@ -231,6 +323,11 @@ $currentDatabase = $isConnected ? 'MySQL' : 'JSON-Dateien';
 
         <div class="alert alert-success" id="success-alert"></div>
         <div class="alert alert-error" id="error-alert"></div>
+
+        <div class="connection-info" id="connection-info">
+            <h4 style="color: #17a2b8; margin-bottom: 0.5rem;">Verbindungshinweise</h4>
+            <p id="provider-info"></p>
+        </div>
 
         <form id="mysql-config-form">
             <div class="grid">
@@ -270,6 +367,45 @@ $currentDatabase = $isConnected ? 'MySQL' : 'JSON-Dateien';
     </div>
 
     <script>
+        const providerTemplates = {
+            planetscale: {
+                port: 3306,
+                info: 'PlanetScale verwendet SSL-Verbindungen. Format: [username].[database-name].psdb.cloud',
+                example: 'main.knockgames.psdb.cloud'
+            },
+            railway: {
+                port: 3306,
+                info: 'Railway MySQL-Instanz. Verwenden Sie die Verbindungsdetails aus Ihrem Railway-Dashboard.',
+                example: 'containers-us-west-xxx.railway.app'
+            },
+            aws: {
+                port: 3306,
+                info: 'AWS RDS MySQL-Instanz. Endpoint aus der RDS-Konsole verwenden.',
+                example: 'knockgames.cluster-xxx.eu-central-1.rds.amazonaws.com'
+            },
+            digitalocean: {
+                port: 25060,
+                info: 'DigitalOcean Managed Database. SSL wird automatisch konfiguriert.',
+                example: 'db-mysql-fra1-xxx-do-user-xxx.b.db.ondigitalocean.com'
+            }
+        };
+
+        function loadTemplate(provider) {
+            const template = providerTemplates[provider];
+            if (!template) return;
+
+            document.getElementById('port').value = template.port;
+            document.getElementById('host').placeholder = template.example;
+            
+            const infoDiv = document.getElementById('connection-info');
+            const infoText = document.getElementById('provider-info');
+            
+            infoText.textContent = template.info;
+            infoDiv.classList.add('show');
+            
+            showAlert(`${provider.charAt(0).toUpperCase() + provider.slice(1)}-Vorlage geladen`, 'success');
+        }
+
         function showAlert(message, type) {
             const successAlert = document.getElementById('success-alert');
             const errorAlert = document.getElementById('error-alert');

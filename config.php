@@ -22,57 +22,81 @@ class Database {
     private $connection;
     
     private function __construct() {
+        // Lade externe Konfiguration falls vorhanden
+        if (file_exists('mysql-config.php')) {
+            include 'mysql-config.php';
+        }
+        
         try {
-            // Versuche verschiedene MySQL-Verbindungsmethoden
-            $connectionAttempts = [
-                // Socket-basierte Verbindung
-                "mysql:unix_socket=" . DB_SOCKET . ";charset=utf8mb4",
-                // Port-basierte Verbindung
-                "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";charset=utf8mb4",
-                // Standard localhost Verbindung
-                "mysql:host=localhost;charset=utf8mb4"
+            // SSL-Optionen für externe Verbindungen
+            $sslOptions = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_TIMEOUT => 10
             ];
             
-            $tempConnection = null;
-            foreach ($connectionAttempts as $dsn) {
-                try {
-                    $tempConnection = new PDO($dsn, DB_USER, DB_PASS, [
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_TIMEOUT => 5
-                    ]);
-                    break;
-                } catch (PDOException $e) {
-                    continue;
-                }
+            // Erweiterte SSL-Unterstützung für externe Anbieter
+            if (defined('DB_SSL') && DB_SSL) {
+                $sslOptions[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+                $sslOptions[PDO::MYSQL_ATTR_SSL_CA] = defined('DB_SSL_CA') ? DB_SSL_CA : null;
             }
             
-            if ($tempConnection) {
-                // Erstelle Datenbank falls sie nicht existiert
-                $tempConnection->exec("CREATE DATABASE IF NOT EXISTS " . DB_NAME . " CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            // Versuche direkte Datenbankverbindung
+            $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+            
+            // Für externe Anbieter SSL aktivieren
+            if (DB_HOST !== 'localhost' && DB_HOST !== '127.0.0.1') {
+                $dsn .= ";sslmode=require";
+            }
+            
+            $this->connection = new PDO($dsn, DB_USER, DB_PASS, $sslOptions);
+            
+            // Teste Verbindung
+            $this->connection->query('SELECT 1');
+            
+        } catch (PDOException $e) {
+            // Versuche Datenbankverbindung ohne spezifische Datenbank (für Erstellung)
+            try {
+                $baseDsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";charset=utf8mb4";
+                if (DB_HOST !== 'localhost' && DB_HOST !== '127.0.0.1') {
+                    $baseDsn .= ";sslmode=require";
+                }
                 
-                // Verbinde mit der spezifischen Datenbank
-                foreach ($connectionAttempts as $dsn) {
+                $tempConnection = new PDO($baseDsn, DB_USER, DB_PASS, $sslOptions);
+                
+                // Erstelle Datenbank falls sie nicht existiert
+                $tempConnection->exec("CREATE DATABASE IF NOT EXISTS `" . DB_NAME . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                
+                // Verbinde nun mit der spezifischen Datenbank
+                $this->connection = new PDO($dsn, DB_USER, DB_PASS, $sslOptions);
+                
+            } catch (PDOException $e2) {
+                // Lokale Verbindungsversuche (Socket, etc.)
+                $localAttempts = [
+                    "mysql:unix_socket=/tmp/mysql.sock;charset=utf8mb4",
+                    "mysql:host=localhost;charset=utf8mb4",
+                    "mysql:host=127.0.0.1;charset=utf8mb4"
+                ];
+                
+                foreach ($localAttempts as $localDsn) {
                     try {
-                        $dbDsn = str_replace(';charset=utf8mb4', ';dbname=' . DB_NAME . ';charset=utf8mb4', $dsn);
-                        $this->connection = new PDO($dbDsn, DB_USER, DB_PASS, [
+                        $this->connection = new PDO($localDsn, DB_USER, DB_PASS, [
                             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                            PDO::ATTR_EMULATE_PREPARES => false
+                            PDO::ATTR_TIMEOUT => 5
                         ]);
                         break;
-                    } catch (PDOException $e) {
+                    } catch (PDOException $e3) {
                         continue;
                     }
                 }
+                
+                if (!$this->connection) {
+                    // Fallback auf JSON-Dateien
+                    $this->connection = null;
+                    error_log("MySQL Connection failed: " . $e->getMessage() . " | " . $e2->getMessage());
+                }
             }
-            
-            if (!$this->connection) {
-                throw new PDOException("Alle MySQL-Verbindungsversuche fehlgeschlagen");
-            }
-        } catch (PDOException $e) {
-            // Fallback auf JSON-Dateien wenn MySQL nicht verfügbar
-            $this->connection = null;
-            error_log("MySQL Connection failed: " . $e->getMessage());
         }
     }
     

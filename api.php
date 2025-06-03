@@ -58,6 +58,7 @@ switch (true) {
         deleteUser($matches[1]);
         break;
     
+    // Ankündigungen CRUD
     case $requestUri === '/api/admin/announcements' && $requestMethod === 'GET':
         requireAuth();
         getAnnouncements();
@@ -78,6 +79,7 @@ switch (true) {
         deleteAnnouncement($matches[1]);
         break;
     
+    // News CRUD
     case $requestUri === '/api/admin/news' && $requestMethod === 'GET':
         requireAuth();
         getNews();

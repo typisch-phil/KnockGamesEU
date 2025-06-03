@@ -288,6 +288,78 @@ async function loadAdminData() {
     }
 }
 
+// Section Navigation
+function showSection(sectionName) {
+    // Verstecke alle Sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Entferne aktive Klasse von allen Navigationslinks
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Zeige gewählte Section
+    const section = document.getElementById(sectionName + '-section');
+    if (section) {
+        section.classList.add('active');
+    }
+    
+    // Aktiviere entsprechenden Navigationslink
+    const navLink = document.querySelector(`.nav-link[onclick="showSection('${sectionName}')"]`);
+    if (navLink) {
+        navLink.classList.add('active');
+    }
+    
+    // Lade entsprechende Daten
+    switch(sectionName) {
+        case 'users':
+            loadUsers();
+            break;
+        case 'announcements':
+            loadAnnouncements();
+            break;
+        case 'news':
+            loadNews();
+            break;
+        case 'dashboard':
+            loadAdminData();
+            break;
+    }
+}
+
+// Data Loading Functions
+async function loadUsers() {
+    try {
+        const users = await apiRequest('/api/admin/users');
+        adminData.users = users;
+        renderUsers();
+    } catch (error) {
+        console.error('Failed to load users:', error);
+    }
+}
+
+async function loadAnnouncements() {
+    try {
+        const announcements = await apiRequest('/api/admin/announcements');
+        adminData.announcements = announcements;
+        renderAnnouncements();
+    } catch (error) {
+        console.error('Failed to load announcements:', error);
+    }
+}
+
+async function loadNews() {
+    try {
+        const news = await apiRequest('/api/admin/news');
+        adminData.news = news;
+        renderNews();
+    } catch (error) {
+        console.error('Failed to load news:', error);
+    }
+}
+
 function updateDashboardStats() {
     document.getElementById('total-users').textContent = adminData.users.length;
     document.getElementById('total-announcements').textContent = adminData.announcements.length;

@@ -294,6 +294,22 @@ body {
     gap: 1rem;
 }
 
+.header-actions .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.header-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 .user-info {
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.9rem;

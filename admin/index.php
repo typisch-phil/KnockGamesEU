@@ -126,6 +126,9 @@ if ($db->isConnected()) {
             <header class="admin-header">
                 <h1 id="page-title">Dashboard</h1>
                 <div class="header-actions">
+                    <a href="/" class="btn btn-secondary" style="margin-right: 1rem;">
+                        <i class="fas fa-home"></i> Zurück zur Homepage
+                    </a>
                     <span class="user-info">Angemeldet als: <strong><?= htmlspecialchars($_SESSION['admin_username']) ?></strong></span>
                 </div>
             </header>

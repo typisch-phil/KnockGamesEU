@@ -15,6 +15,8 @@ import {
   type SiteSetting,
   type InsertSiteSetting,
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -27,6 +29,7 @@ export interface IStorage {
   
   // Announcement operations
   getAnnouncements(): Promise<Announcement[]>;
+  getActiveAnnouncements(): Promise<Announcement[]>;
   getAnnouncement(id: number): Promise<Announcement | undefined>;
   createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement>;
   updateAnnouncement(id: number, updates: Partial<InsertAnnouncement>): Promise<Announcement>;
@@ -56,235 +59,243 @@ export interface IStorage {
   deleteSiteSetting(key: string): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private announcements: Map<number, Announcement>;
-  private newsArticles: Map<number, NewsArticle>;
-  private trainingPrograms: Map<number, TrainingProgram>;
-  private siteSettings: Map<string, SiteSetting>;
-  private currentUserId: number;
-  private currentAnnouncementId: number;
-  private currentNewsId: number;
-  private currentTrainingId: number;
-  private currentSettingId: number;
-
+export class DatabaseStorage implements IStorage {
+  
   constructor() {
-    this.users = new Map();
-    this.announcements = new Map();
-    this.newsArticles = new Map();
-    this.trainingPrograms = new Map();
-    this.siteSettings = new Map();
-    this.currentUserId = 1;
-    this.currentAnnouncementId = 1;
-    this.currentNewsId = 1;
-    this.currentTrainingId = 1;
-    this.currentSettingId = 1;
-    
-    // Initialize with default admin user
-    this.createUser({
-      username: "admin",
-      password: "admin123",
-      role: "admin"
-    });
+    // Initialize database with default data
+    this.initializeDatabase();
+  }
+
+  private async initializeDatabase() {
+    try {
+      // Check if admin user exists, create if not
+      const adminUser = await db.select().from(users).where(eq(users.username, 'admin'));
+      if (adminUser.length === 0) {
+        await db.insert(users).values({
+          username: 'admin',
+          password: 'admin123', // In production, this should be hashed
+          role: 'admin'
+        });
+      }
+
+      // Initialize sample training programs if none exist
+      const existingPrograms = await db.select().from(trainingPrograms);
+      if (existingPrograms.length === 0) {
+        await db.insert(trainingPrograms).values([
+          {
+            name: "Beginner Package",
+            description: "Perfect for new players starting their Minecraft journey",
+            features: JSON.stringify(["Basic commands", "Server rules", "Getting started guide"]),
+            price: "Free",
+            popular: false,
+            active: true
+          },
+          {
+            name: "Professional Package", 
+            description: "Advanced training for experienced players",
+            features: JSON.stringify(["Advanced techniques", "PvP training", "Building workshops", "Resource management"]),
+            price: "€19.99",
+            popular: true,
+            active: true
+          },
+          {
+            name: "Elite Package",
+            description: "Comprehensive training with personal coaching", 
+            features: JSON.stringify(["Everything in Professional", "1-on-1 coaching", "Custom strategies", "Priority support", "Exclusive content"]),
+            price: "€39.99",
+            popular: false,
+            active: true
+          }
+        ]);
+      }
+    } catch (error) {
+      console.error('Database initialization error:', error);
+    }
   }
 
   // User operations
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { 
-      ...insertUser, 
-      id,
-      createdAt: new Date()
-    };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async updateUser(id: number, updates: Partial<InsertUser>): Promise<User> {
-    const user = this.users.get(id);
-    if (!user) throw new Error("User not found");
-    
-    const updatedUser = { ...user, ...updates };
-    this.users.set(id, updatedUser);
-    return updatedUser;
+    const [user] = await db.update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
   }
 
   async deleteUser(id: number): Promise<void> {
-    this.users.delete(id);
+    await db.delete(users).where(eq(users.id, id));
   }
 
   async getAllUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
+    return await db.select().from(users);
   }
 
   // Announcement operations
   async getAnnouncements(): Promise<Announcement[]> {
-    return Array.from(this.announcements.values());
+    return await db.select().from(announcements);
+  }
+
+  async getActiveAnnouncements(): Promise<Announcement[]> {
+    return await db.select().from(announcements).where(eq(announcements.active, true));
   }
 
   async getAnnouncement(id: number): Promise<Announcement | undefined> {
-    return this.announcements.get(id);
+    const [announcement] = await db.select().from(announcements).where(eq(announcements.id, id));
+    return announcement;
   }
 
   async createAnnouncement(insertAnnouncement: InsertAnnouncement): Promise<Announcement> {
-    const id = this.currentAnnouncementId++;
-    const announcement: Announcement = {
-      ...insertAnnouncement,
-      id,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    this.announcements.set(id, announcement);
+    const [announcement] = await db.insert(announcements)
+      .values({
+        ...insertAnnouncement,
+        updatedAt: new Date()
+      })
+      .returning();
     return announcement;
   }
 
   async updateAnnouncement(id: number, updates: Partial<InsertAnnouncement>): Promise<Announcement> {
-    const announcement = this.announcements.get(id);
-    if (!announcement) throw new Error("Announcement not found");
-    
-    const updatedAnnouncement = { 
-      ...announcement, 
-      ...updates,
-      updatedAt: new Date()
-    };
-    this.announcements.set(id, updatedAnnouncement);
-    return updatedAnnouncement;
+    const [announcement] = await db.update(announcements)
+      .set({
+        ...updates,
+        updatedAt: new Date()
+      })
+      .where(eq(announcements.id, id))
+      .returning();
+    return announcement;
   }
 
   async deleteAnnouncement(id: number): Promise<void> {
-    this.announcements.delete(id);
+    await db.delete(announcements).where(eq(announcements.id, id));
   }
 
   // News article operations
   async getNewsArticles(): Promise<NewsArticle[]> {
-    return Array.from(this.newsArticles.values());
+    return await db.select().from(newsArticles);
   }
 
   async getPublishedNewsArticles(): Promise<NewsArticle[]> {
-    return Array.from(this.newsArticles.values()).filter(article => article.published);
+    return await db.select().from(newsArticles).where(eq(newsArticles.published, true));
   }
 
   async getNewsArticle(id: number): Promise<NewsArticle | undefined> {
-    return this.newsArticles.get(id);
+    const [article] = await db.select().from(newsArticles).where(eq(newsArticles.id, id));
+    return article;
   }
 
   async createNewsArticle(insertArticle: InsertNewsArticle): Promise<NewsArticle> {
-    const id = this.currentNewsId++;
-    const article: NewsArticle = {
-      ...insertArticle,
-      id,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    this.newsArticles.set(id, article);
+    const [article] = await db.insert(newsArticles)
+      .values({
+        ...insertArticle,
+        updatedAt: new Date()
+      })
+      .returning();
     return article;
   }
 
   async updateNewsArticle(id: number, updates: Partial<InsertNewsArticle>): Promise<NewsArticle> {
-    const article = this.newsArticles.get(id);
-    if (!article) throw new Error("News article not found");
-    
-    const updatedArticle = {
-      ...article,
-      ...updates,
-      updatedAt: new Date()
-    };
-    this.newsArticles.set(id, updatedArticle);
-    return updatedArticle;
+    const [article] = await db.update(newsArticles)
+      .set({
+        ...updates,
+        updatedAt: new Date()
+      })
+      .where(eq(newsArticles.id, id))
+      .returning();
+    return article;
   }
 
   async deleteNewsArticle(id: number): Promise<void> {
-    this.newsArticles.delete(id);
+    await db.delete(newsArticles).where(eq(newsArticles.id, id));
   }
 
   // Training program operations
   async getTrainingPrograms(): Promise<TrainingProgram[]> {
-    return Array.from(this.trainingPrograms.values());
+    return await db.select().from(trainingPrograms);
   }
 
   async getActiveTrainingPrograms(): Promise<TrainingProgram[]> {
-    return Array.from(this.trainingPrograms.values()).filter(program => program.active);
+    return await db.select().from(trainingPrograms).where(eq(trainingPrograms.active, true));
   }
 
   async getTrainingProgram(id: number): Promise<TrainingProgram | undefined> {
-    return this.trainingPrograms.get(id);
+    const [program] = await db.select().from(trainingPrograms).where(eq(trainingPrograms.id, id));
+    return program;
   }
 
   async createTrainingProgram(insertProgram: InsertTrainingProgram): Promise<TrainingProgram> {
-    const id = this.currentTrainingId++;
-    const program: TrainingProgram = {
-      ...insertProgram,
-      id,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    this.trainingPrograms.set(id, program);
+    const [program] = await db.insert(trainingPrograms)
+      .values({
+        ...insertProgram,
+        updatedAt: new Date()
+      })
+      .returning();
     return program;
   }
 
   async updateTrainingProgram(id: number, updates: Partial<InsertTrainingProgram>): Promise<TrainingProgram> {
-    const program = this.trainingPrograms.get(id);
-    if (!program) throw new Error("Training program not found");
-    
-    const updatedProgram = {
-      ...program,
-      ...updates,
-      updatedAt: new Date()
-    };
-    this.trainingPrograms.set(id, updatedProgram);
-    return updatedProgram;
+    const [program] = await db.update(trainingPrograms)
+      .set({
+        ...updates,
+        updatedAt: new Date()
+      })
+      .where(eq(trainingPrograms.id, id))
+      .returning();
+    return program;
   }
 
   async deleteTrainingProgram(id: number): Promise<void> {
-    this.trainingPrograms.delete(id);
+    await db.delete(trainingPrograms).where(eq(trainingPrograms.id, id));
   }
 
   // Site settings operations
   async getSiteSettings(): Promise<SiteSetting[]> {
-    return Array.from(this.siteSettings.values());
+    return await db.select().from(siteSettings);
   }
 
   async getSiteSetting(key: string): Promise<SiteSetting | undefined> {
-    return this.siteSettings.get(key);
+    const [setting] = await db.select().from(siteSettings).where(eq(siteSettings.key, key));
+    return setting;
   }
 
   async setSiteSetting(insertSetting: InsertSiteSetting): Promise<SiteSetting> {
-    const id = this.currentSettingId++;
-    const setting: SiteSetting = {
-      ...insertSetting,
-      id,
-      updatedAt: new Date()
-    };
-    this.siteSettings.set(insertSetting.key, setting);
+    const [setting] = await db.insert(siteSettings)
+      .values({
+        ...insertSetting,
+        updatedAt: new Date()
+      })
+      .returning();
     return setting;
   }
 
   async updateSiteSetting(key: string, value: string): Promise<SiteSetting> {
-    const setting = this.siteSettings.get(key);
-    if (!setting) throw new Error("Site setting not found");
-    
-    const updatedSetting = {
-      ...setting,
-      value,
-      updatedAt: new Date()
-    };
-    this.siteSettings.set(key, updatedSetting);
-    return updatedSetting;
+    const [setting] = await db.update(siteSettings)
+      .set({
+        value,
+        updatedAt: new Date()
+      })
+      .where(eq(siteSettings.key, key))
+      .returning();
+    return setting;
   }
 
   async deleteSiteSetting(key: string): Promise<void> {
-    this.siteSettings.delete(key);
+    await db.delete(siteSettings).where(eq(siteSettings.key, key));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

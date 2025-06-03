@@ -525,6 +525,13 @@ body {
     gap: 2rem;
 }
 
+.section-header .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    min-width: 150px;
+}
+
 .section-header h3 {
     font-size: 1.5rem;
     font-weight: 600;
@@ -728,14 +735,15 @@ body {
 .modal-content {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
-    padding: 2rem;
+    padding: 0;
     border-radius: var(--border-radius);
     width: 90%;
-    max-width: 500px;
+    max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
     transform: scale(0.8);
     transition: var(--transition);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .modal.show .modal-content {
@@ -746,8 +754,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
+    padding: 2rem 2rem 1rem 2rem;
     border-bottom: 2px solid rgba(255, 145, 36, 0.3);
 }
 
@@ -771,9 +778,22 @@ body {
     transform: scale(1.1);
 }
 
+/* Modal Body and Footer */
+.modal-body {
+    padding: 2rem 2rem 1.5rem 2rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem 2rem 2rem 2rem;
+    border-top: 1px solid rgba(255, 145, 36, 0.3);
+}
+
 /* Form Styles in Modal */
 .modal .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.8rem;
 }
 
 .modal .form-group label {

@@ -284,6 +284,7 @@ if ($db->isConnected()) {
                                 <tr>
                                     <th onclick="sortNews('id')">ID ↕️</th>
                                     <th onclick="sortNews('title')">Titel ↕️</th>
+                                    <th onclick="sortNews('excerpt')">Inhalt ↕️</th>
                                     <th onclick="sortNews('published')">Status ↕️</th>
                                     <th onclick="sortNews('created_at')">Erstellt ↕️</th>
                                     <th>Aktionen</th>

@@ -162,14 +162,54 @@ function adminLogin() {
     $username = $input['username'] ?? '';
     $password = $input['password'] ?? '';
     
+    // Prüfe Standard-Admin-Account
     if ($username === ADMIN_USERNAME && $password === ADMIN_PASSWORD) {
         startSession();
         $_SESSION['admin_logged_in'] = true;
         $_SESSION['admin_username'] = $username;
+        $_SESSION['admin_role'] = 'admin';
         jsonResponse(['success' => true, 'message' => 'Erfolgreich angemeldet']);
-    } else {
-        jsonResponse(['error' => 'Ungültige Anmeldedaten'], 401);
+        return;
     }
+    
+    // Prüfe Benutzer aus Datenbank/JSON
+    $db = Database::getInstance();
+    
+    if ($db->isConnected()) {
+        $pdo = $db->getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? AND (role = 'admin' OR role = 'moderator')");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
+        
+        if ($user && password_verify($password, $user['password'])) {
+            startSession();
+            $_SESSION['admin_logged_in'] = true;
+            $_SESSION['admin_username'] = $user['username'];
+            $_SESSION['admin_role'] = $user['role'];
+            $_SESSION['admin_user_id'] = $user['id'];
+            jsonResponse(['success' => true, 'message' => 'Erfolgreich angemeldet']);
+            return;
+        }
+    } else {
+        $storage = new JsonStorage();
+        $users = $storage->read('users');
+        
+        foreach ($users as $user) {
+            if ($user['username'] === $username && 
+                ($user['role'] === 'admin' || $user['role'] === 'moderator') &&
+                password_verify($password, $user['password'])) {
+                startSession();
+                $_SESSION['admin_logged_in'] = true;
+                $_SESSION['admin_username'] = $user['username'];
+                $_SESSION['admin_role'] = $user['role'];
+                $_SESSION['admin_user_id'] = $user['id'];
+                jsonResponse(['success' => true, 'message' => 'Erfolgreich angemeldet']);
+                return;
+            }
+        }
+    }
+    
+    jsonResponse(['error' => 'Ungültige Anmeldedaten'], 401);
 }
 
 function adminLogout() {
@@ -223,9 +263,10 @@ function createUser() {
             jsonResponse(['error' => 'Benutzername bereits vorhanden'], 400);
         }
         
-        // Erstelle neuen Benutzer
+        // Erstelle neuen Benutzer mit gehashtem Passwort
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$username, $password, $email ?: null, $role]);
+        $stmt->execute([$username, $hashedPassword, $email ?: null, $role]);
         
         $userId = $pdo->lastInsertId();
         $stmt = $pdo->prepare("SELECT id, username, email, role, created_at FROM users WHERE id = ?");
@@ -242,11 +283,12 @@ function createUser() {
             }
         }
         
-        // Neuen Benutzer erstellen
+        // Neuen Benutzer erstellen mit gehashtem Passwort
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $newUser = [
             'id' => count($users) + 1,
             'username' => $username,
-            'password' => $password,
+            'password' => $hashedPassword,
             'email' => $email ?: null,
             'role' => $role,
             'created_at' => date('c')
@@ -297,8 +339,9 @@ function updateUser($userId) {
         
         // Update Benutzer
         if (!empty($password)) {
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("UPDATE users SET username = ?, password = ?, email = ?, role = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
-            $stmt->execute([$username, $password, $email ?: null, $role, $userId]);
+            $stmt->execute([$username, $hashedPassword, $email ?: null, $role, $userId]);
         } else {
             $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
             $stmt->execute([$username, $email ?: null, $role, $userId]);
@@ -338,7 +381,7 @@ function updateUser($userId) {
         $users[$userIndex]['updated_at'] = date('c');
         
         if (!empty($password)) {
-            $users[$userIndex]['password'] = $password;
+            $users[$userIndex]['password'] = password_hash($password, PASSWORD_DEFAULT);
         }
         
         $storage->write('users', $users);

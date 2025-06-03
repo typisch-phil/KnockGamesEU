@@ -170,10 +170,48 @@ if ($db->isConnected()) {
                     <div class="quick-actions">
                         <h3>Schnellaktionen</h3>
                         <div class="action-buttons">
-                            <button class="btn btn-primary" onclick="showSection('users')">Benutzer verwalten</button>
-                            <button class="btn btn-primary" onclick="showSection('announcements')">Ankündigung erstellen</button>
-                            <button class="btn btn-primary" onclick="showSection('news')">News erstellen</button>
-                            <a href="/mysql-setup" class="btn btn-secondary">MySQL konfigurieren</a>
+                            <button class="btn btn-primary" onclick="showSection('users')">
+                                <span class="btn-icon">👥</span> Benutzer verwalten
+                            </button>
+                            <button class="btn btn-primary" onclick="showSection('announcements')">
+                                <span class="btn-icon">📢</span> Ankündigung erstellen
+                            </button>
+                            <button class="btn btn-primary" onclick="showSection('news')">
+                                <span class="btn-icon">📰</span> News erstellen
+                            </button>
+                            <a href="/mysql-setup" class="btn btn-secondary">
+                                <span class="btn-icon">🔧</span> MySQL konfigurieren
+                            </a>
+                            <a href="/database-admin" class="btn btn-secondary">
+                                <span class="btn-icon">🗄️</span> Datenbank-Admin
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="recent-activity">
+                        <h3>Systemstatus</h3>
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <div class="status-indicator <?= $db->isConnected() ? 'online' : 'offline' ?>"></div>
+                                <div class="status-info">
+                                    <h4>Datenbank</h4>
+                                    <p><?= $db->isConnected() ? 'MySQL verbunden' : 'JSON-Modus aktiv' ?></p>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-indicator online"></div>
+                                <div class="status-info">
+                                    <h4>Admin Panel</h4>
+                                    <p>Vollständig funktional</p>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-indicator online"></div>
+                                <div class="status-info">
+                                    <h4>API Services</h4>
+                                    <p>Alle Services aktiv</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>

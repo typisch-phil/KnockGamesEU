@@ -1189,7 +1189,7 @@ if ($db->isConnected()) {
             </section>
 
             <!-- Spacer zwischen Live Server Status und Ankündigungen -->
-            <div style="height: 150px;"></div>
+            <div style="height: 250px;"></div>
 
             <?php if (!empty($announcements)): ?>
             <section class="section" id="announcements">

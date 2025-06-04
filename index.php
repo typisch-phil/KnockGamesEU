@@ -727,6 +727,114 @@ if ($db->isConnected()) {
                 font-size: 1.3rem;
             }
         }
+
+        /* Footer Styles */
+        footer {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(26, 26, 46, 0.9) 100%);
+            backdrop-filter: blur(20px);
+            padding: 3rem 0 1rem 0;
+            margin-top: 3rem;
+            border-top: 2px solid rgba(255, 145, 36, 0.3);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ff9124;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(255, 145, 36, 0.3);
+        }
+
+        .footer-section h4 {
+            color: #ff9124;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-section p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #ff9124;
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 145, 36, 0.1);
+            border: 1px solid rgba(255, 145, 36, 0.3);
+            border-radius: 5px;
+            color: #ff9124;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: rgba(255, 145, 36, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 145, 36, 0.3);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 145, 36, 0.2);
+        }
+
+        .footer-bottom p {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Footer Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+
+            .footer-section {
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -844,15 +952,27 @@ if ($db->isConnected()) {
                 <div class="cards">
                     <div class="card">
                         <h3>Discord Server</h3>
-                        <p>Tritt unserem Discord bei und vernetze dich mit anderen Spielern aus der Community.</p>
+                        <p>Tritt unserem Discord bei und vernetze dich mit anderen Spielern aus der Community. Hier findest du immer Mitspieler für Training und PvP.</p>
                     </div>
                     <div class="card">
                         <h3>Events & Turniere</h3>
-                        <p>Nimm an regelmäßigen Events und Turnieren teil und gewinne exklusive Belohnungen.</p>
+                        <p>Nimm an regelmäßigen Events und Turnieren teil und gewinne exklusive Belohnungen. Wöchentliche PvP-Turniere mit attraktiven Preisen.</p>
                     </div>
                     <div class="card">
                         <h3>Leaderboard</h3>
-                        <p>Sieh wo du stehst und messe dich mit den besten Spielern des Servers.</p>
+                        <p>Sieh wo du stehst und messe dich mit den besten Spielern des Servers. Kämpfe um den ersten Platz in verschiedenen Kategorien.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Team Recruitment</h3>
+                        <p>Finde dein perfektes Team oder recrute neue Mitglieder für deine Gruppe. Gemeinsam seid ihr stärker!</p>
+                    </div>
+                    <div class="card">
+                        <h3>Coaching & Mentoring</h3>
+                        <p>Erfahrene Spieler helfen Neulingen beim Einstieg. Profitiere von wertvollen Tipps und Tricks der Community.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Community Feedback</h3>
+                        <p>Deine Meinung ist wichtig! Teile Feedback und Vorschläge für Verbesserungen direkt mit dem Team.</p>
                     </div>
                 </div>
             </section>
@@ -861,8 +981,53 @@ if ($db->isConnected()) {
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 KnockGames.eu - Alle Rechte vorbehalten</p>
-            <p>Dein ultimatives Minecraft Training Network</p>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>KnockGames.eu</h3>
+                    <p>Das ultimative Minecraft Training Network für PvP-Enthusiasten. Verbessere deine Fähigkeiten in einer professionellen Umgebung.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">Discord</a>
+                        <a href="#" class="social-link">YouTube</a>
+                        <a href="#" class="social-link">Twitter</a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Training</h4>
+                    <ul>
+                        <li><a href="#training">PvP Arena</a></li>
+                        <li><a href="#training">Combo Training</a></li>
+                        <li><a href="#training">Speed Building</a></li>
+                        <li><a href="#community">Turniere</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="#community">Discord Server</a></li>
+                        <li><a href="#community">Events</a></li>
+                        <li><a href="#community">Leaderboard</a></li>
+                        <li><a href="#community">Teams</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Server Info</h4>
+                    <ul>
+                        <li>IP: <span class="copy-ip" onclick="copyServerIP()" style="cursor: pointer; color: #ff9124;">knockgames.eu</span></li>
+                        <li>Status: <span id="footerServerStatus" class="status-loading">Lädt...</span></li>
+                        <li>Spieler: <span id="footerPlayerCount">-/-</span></li>
+                        <li>Version: <span id="footerServerVersion">-</span></li>
+                        <li><a href="/admin">Admin Panel</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 KnockGames.eu - Alle Rechte vorbehalten</p>
+                <p>Erstellt mit ❤️ für die Minecraft Community</p>
+            </div>
         </div>
     </footer>
 
@@ -1104,6 +1269,11 @@ if ($db->isConnected()) {
             const playerCountElement = document.getElementById('playerCount');
             const serverVersionElement = document.getElementById('serverVersion');
             const statusIcon = statusWidget.querySelector('.tile-icon');
+            
+            // Footer Elemente
+            const footerStatusElement = document.getElementById('footerServerStatus');
+            const footerPlayerCountElement = document.getElementById('footerPlayerCount');
+            const footerVersionElement = document.getElementById('footerServerVersion');
 
             // Fallback für Demo-Zwecke - zeigt statische Informationen
             // Für echte Server-Daten benötigen wir externe API-Schlüssel oder Server-Zugang
@@ -1140,6 +1310,20 @@ if ($db->isConnected()) {
                     if (serverVersionElement) {
                         serverVersionElement.textContent = data.version || '1.8+';
                     }
+                    
+                    // Footer Updates
+                    if (footerStatusElement) {
+                        footerStatusElement.textContent = 'Online';
+                        footerStatusElement.className = 'status-online';
+                    }
+                    
+                    if (footerPlayerCountElement) {
+                        footerPlayerCountElement.textContent = `${data.players.online}/${data.players.max}`;
+                    }
+                    
+                    if (footerVersionElement) {
+                        footerVersionElement.textContent = data.version || '1.8+';
+                    }
                 } else {
                     statusTile.className = 'tile-value status-offline';
                     statusTile.textContent = 'Offline';
@@ -1151,6 +1335,20 @@ if ($db->isConnected()) {
 
                     if (serverVersionElement) {
                         serverVersionElement.textContent = '-';
+                    }
+                    
+                    // Footer Updates
+                    if (footerStatusElement) {
+                        footerStatusElement.textContent = 'Offline';
+                        footerStatusElement.className = 'status-offline';
+                    }
+                    
+                    if (footerPlayerCountElement) {
+                        footerPlayerCountElement.textContent = '0/0';
+                    }
+                    
+                    if (footerVersionElement) {
+                        footerVersionElement.textContent = '-';
                     }
                 }
             } catch (error) {
@@ -1164,6 +1362,20 @@ if ($db->isConnected()) {
 
                 if (serverVersionElement) {
                     serverVersionElement.textContent = '-';
+                }
+                
+                // Footer Updates
+                if (footerStatusElement) {
+                    footerStatusElement.textContent = 'Wartung';
+                    footerStatusElement.className = 'status-offline';
+                }
+                
+                if (footerPlayerCountElement) {
+                    footerPlayerCountElement.textContent = '-/-';
+                }
+                
+                if (footerVersionElement) {
+                    footerVersionElement.textContent = '-';
                 }
             }
             

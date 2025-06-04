@@ -914,24 +914,41 @@ if ($db->isConnected()) {
         function updateActiveNavigation() {
             const sections = document.querySelectorAll('section[id]');
             const navLinks = document.querySelectorAll('nav a[href^="#"]');
-            const scrollPosition = window.scrollY + 100; // Offset für bessere Erkennung
+            const scrollPosition = window.scrollY + 150; // Offset für bessere Erkennung
+            
+            let currentSection = null;
+            let maxDistance = Infinity;
 
+            // Finde die nächstgelegene Sektion
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
-                const sectionHeight = section.offsetHeight;
                 const sectionId = section.getAttribute('id');
+                const distance = Math.abs(scrollPosition - sectionTop);
 
-                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                    // Entferne active-Klasse von allen Links
-                    navLinks.forEach(link => link.classList.remove('active'));
-                    
-                    // Füge active-Klasse zum entsprechenden Link hinzu
-                    const activeLink = document.querySelector(`nav a[href="#${sectionId}"]`);
-                    if (activeLink) {
-                        activeLink.classList.add('active');
-                    }
+                if (scrollPosition >= sectionTop - 200 && distance < maxDistance) {
+                    maxDistance = distance;
+                    currentSection = sectionId;
                 }
             });
+
+            // Entferne active-Klasse von allen Links
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            // Füge active-Klasse zum entsprechenden Link hinzu
+            if (currentSection) {
+                const activeLink = document.querySelector(`nav a[href="#${currentSection}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+            } else {
+                // Fallback: Aktiviere Home wenn ganz oben
+                if (scrollPosition < 300) {
+                    const homeLink = document.querySelector('nav a[href="#home"]');
+                    if (homeLink) {
+                        homeLink.classList.add('active');
+                    }
+                }
+            }
         }
 
         // Event Listener für Scroll

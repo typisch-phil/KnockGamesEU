@@ -72,6 +72,19 @@ body {
     margin-bottom: 2.5rem;
 }
 
+.login-box .logo .logo-img {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 15px rgba(255, 145, 36, 0.6));
+    transition: all 0.3s ease;
+}
+
+.login-box .logo .logo-img:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 25px rgba(255, 145, 36, 0.8));
+}
+
 .login-box .logo h1 {
     color: #ff9124;
     font-size: 2.5rem;
@@ -221,6 +234,20 @@ body {
     padding: 2rem 1.5rem;
     border-bottom: 2px solid rgba(255, 145, 36, 0.3);
     background: rgba(255, 145, 36, 0.15);
+    text-align: center;
+}
+
+.sidebar-header .sidebar-logo {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 12px rgba(255, 145, 36, 0.6));
+    transition: all 0.3s ease;
+}
+
+.sidebar-header .sidebar-logo:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 20px rgba(255, 145, 36, 0.8));
 }
 
 .sidebar-header h2 {

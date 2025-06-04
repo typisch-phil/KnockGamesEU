@@ -114,6 +114,9 @@ if ($db->isConnected()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - KnockGames.eu</title>
+    <link rel="icon" type="image/png" href="../attached_assets/knockgameseu.png">
+    <link rel="shortcut icon" type="image/png" href="../attached_assets/knockgameseu.png">
+    <link rel="apple-touch-icon" href="../attached_assets/knockgameseu.png">
     <link rel="stylesheet" href="/admin/admin.css">
 </head>
 <body>
@@ -122,6 +125,7 @@ if ($db->isConnected()) {
     <div class="login-container">
         <div class="login-box">
             <div class="logo">
+                <img src="../attached_assets/knockgameseu.png" alt="KnockGames.eu Logo" class="logo-img">
                 <h1>KnockGames.eu</h1>
                 <p>Admin Panel</p>
             </div>
@@ -157,6 +161,7 @@ if ($db->isConnected()) {
     <div class="admin-container">
         <nav class="admin-sidebar">
             <div class="sidebar-header">
+                <img src="../attached_assets/knockgameseu.png" alt="KnockGames.eu Logo" class="sidebar-logo">
                 <h2>KnockGames.eu</h2>
                 <p>Admin Panel</p>
             </div>

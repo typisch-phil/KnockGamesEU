@@ -739,8 +739,8 @@ if ($db->isConnected()) {
                         <li><a href="#home">Home</a></li>
                         <li><a href="#announcements">Ankündigungen</a></li>
                         <li><a href="#training">Training</a></li>
-                        <li><a href="#community">Community</a></li>
                         <li><a href="#news">News</a></li>
+                        <li><a href="#community">Community</a></li>
                     </ul>
                 </nav>
             </div>
@@ -957,6 +957,39 @@ if ($db->isConnected()) {
         
         // Initiale Aktivierung beim Laden
         document.addEventListener('DOMContentLoaded', updateActiveNavigation);
+
+        // Smooth Scrolling für Navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('nav a[href^="#"]');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href').substring(1);
+                    
+                    if (targetId === 'home') {
+                        // Scroll ganz nach oben für Home
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    } else {
+                        // Scroll zu anderen Sektionen
+                        const targetSection = document.getElementById(targetId);
+                        if (targetSection) {
+                            const headerHeight = 80; // Header-Höhe berücksichtigen
+                            const targetPosition = targetSection.offsetTop - headerHeight;
+                            
+                            window.scrollTo({
+                                top: targetPosition,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        });
 
         // Daten für Modal
         const announcements = <?= json_encode($announcements) ?>;

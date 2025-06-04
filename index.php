@@ -1378,19 +1378,26 @@ if ($db->isConnected()) {
         function updateActiveNavigation() {
             const sections = document.querySelectorAll('section[id]');
             const navLinks = document.querySelectorAll('nav a[href^="#"]');
-            const scrollPosition = window.scrollY + 150; // Offset für bessere Erkennung
+            const scrollPosition = window.scrollY + 100; // Reduzierter Offset
             
             let currentSection = null;
-            let maxDistance = Infinity;
 
-            // Finde die nächstgelegene Sektion
-            sections.forEach(section => {
+            // Durchlaufe Sektionen in umgekehrter Reihenfolge für bessere Erkennung
+            const sectionsArray = Array.from(sections).reverse();
+            
+            sectionsArray.forEach(section => {
                 const sectionTop = section.offsetTop;
                 const sectionId = section.getAttribute('id');
-                const distance = Math.abs(scrollPosition - sectionTop);
+                
+                // Spezielle Behandlung für announcements Sektion
+                let offset = 300; // Standard-Offset
+                if (sectionId === 'announcements') {
+                    offset = 400; // Größerer Offset für Ankündigungen
+                } else if (sectionId === 'home') {
+                    offset = 100; // Kleinerer Offset für Home
+                }
 
-                if (scrollPosition >= sectionTop - 200 && distance < maxDistance) {
-                    maxDistance = distance;
+                if (scrollPosition >= sectionTop - offset && !currentSection) {
                     currentSection = sectionId;
                 }
             });
@@ -1441,7 +1448,15 @@ if ($db->isConnected()) {
                         // Scroll zu anderen Sektionen
                         const targetSection = document.getElementById(targetId);
                         if (targetSection) {
-                            const headerHeight = 80; // Header-Höhe berücksichtigen
+                            let headerHeight = 80; // Standard Header-Höhe
+                            
+                            // Spezielle Offsets für verschiedene Sektionen
+                            if (targetId === 'announcements') {
+                                headerHeight = 120; // Mehr Abstand für Ankündigungen
+                            } else if (targetId === 'home') {
+                                headerHeight = 60; // Weniger Abstand für Home
+                            }
+                            
                             const targetPosition = targetSection.offsetTop - headerHeight;
                             
                             window.scrollTo({

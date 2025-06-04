@@ -657,12 +657,16 @@ if ($db->isConnected()) {
             font-size: 0.9rem;
         }
 
-        .refresh-btn {
+        .dashboard-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .refresh-btn, .copy-ip-btn {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             padding: 0.8rem 1.5rem;
-            background: linear-gradient(135deg, #ff9124, #ff7a00);
             border: none;
             border-radius: 25px;
             color: white;
@@ -674,18 +678,36 @@ if ($db->isConnected()) {
             font-size: 0.9rem;
         }
 
+        .refresh-btn {
+            background: linear-gradient(135deg, #ff9124, #ff7a00);
+        }
+
+        .copy-ip-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
         .refresh-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(255, 145, 36, 0.4);
             background: linear-gradient(135deg, #ff7a00, #ff6500);
         }
 
-        .refresh-icon {
+        .copy-ip-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+            background: linear-gradient(135deg, #20c997, #17a2b8);
+        }
+
+        .refresh-icon, .copy-icon {
             transition: transform 0.3s ease;
         }
 
         .refresh-btn:hover .refresh-icon {
             transform: rotate(180deg);
+        }
+
+        .copy-ip-btn:hover .copy-icon {
+            transform: scale(1.2);
         }
 
         .status-online {
@@ -884,6 +906,19 @@ if ($db->isConnected()) {
                 flex-direction: column;
                 gap: 1rem;
                 text-align: center;
+            }
+
+            .dashboard-buttons {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.5rem;
+            }
+
+            .refresh-btn, .copy-ip-btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.8rem;
+                width: 100%;
+                justify-content: center;
             }
 
             .status-card {
@@ -1139,14 +1174,18 @@ if ($db->isConnected()) {
                     
                     <div class="dashboard-footer">
                         <div class="last-update">Letzte Aktualisierung: <span id="lastUpdate">-</span></div>
-                        <button class="refresh-btn" id="manualRefresh" onclick="refreshServerStatus()">
-                            <span class="refresh-icon">🔄</span>
-                            Aktualisieren
-                        </button>
+                        <div class="dashboard-buttons">
+                            <button class="copy-ip-btn" onclick="copyServerIP()">
+                                <span class="copy-icon">📋</span>
+                                Server IP Kopieren
+                            </button>
+                            <button class="refresh-btn" id="manualRefresh" onclick="refreshServerStatus()">
+                                <span class="refresh-icon">🔄</span>
+                                Aktualisieren
+                            </button>
+                        </div>
                     </div>
                 </div>
-                
-                <button class="cta-button" onclick="copyServerIP()">Server IP Kopieren</button>
             </section>
 
             <?php if (!empty($announcements)): ?>

@@ -935,7 +935,7 @@ if ($db->isConnected()) {
 
             /* Mobile Spacer Anpassung */
             .section + div[style*="height: 250px"] {
-                height: 150px !important;
+                height: 200px !important;
             }
 
             .cta-button {

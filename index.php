@@ -109,11 +109,27 @@ if ($db->isConnected()) {
             padding: 0.5rem 1rem;
             border-radius: 5px;
             transition: all 0.3s ease;
+            position: relative;
         }
 
-        nav a:hover {
+        nav a:hover,
+        nav a.active {
             background: #ff9124;
             color: #000;
+            box-shadow: 0 0 15px rgba(255, 145, 36, 0.4);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: #ff9124;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 145, 36, 0.6);
         }
 
         main {
@@ -893,6 +909,36 @@ if ($db->isConnected()) {
                 hero.style.transform = `translateY(${scrolled * 0.5}px)`;
             }
         });
+
+        // Scroll Spy für Navigation
+        function updateActiveNavigation() {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('nav a[href^="#"]');
+            const scrollPosition = window.scrollY + 100; // Offset für bessere Erkennung
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                const sectionId = section.getAttribute('id');
+
+                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                    // Entferne active-Klasse von allen Links
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    
+                    // Füge active-Klasse zum entsprechenden Link hinzu
+                    const activeLink = document.querySelector(`nav a[href="#${sectionId}"]`);
+                    if (activeLink) {
+                        activeLink.classList.add('active');
+                    }
+                }
+            });
+        }
+
+        // Event Listener für Scroll
+        window.addEventListener('scroll', updateActiveNavigation);
+        
+        // Initiale Aktivierung beim Laden
+        document.addEventListener('DOMContentLoaded', updateActiveNavigation);
 
         // Daten für Modal
         const announcements = <?= json_encode($announcements) ?>;

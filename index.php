@@ -1015,9 +1015,10 @@ if ($db->isConnected()) {
                 <div class="footer-section">
                     <h4>Server Info</h4>
                     <ul>
-                        <li>IP: knockgames.eu</li>
-                        <li>Version: 1.20.x</li>
-                        <li>24/7 Online</li>
+                        <li>IP: <span class="copy-ip" onclick="copyServerIP()" style="cursor: pointer; color: #ff9124;">knockgames.eu</span></li>
+                        <li>Status: <span id="footerServerStatus" class="status-loading">Lädt...</span></li>
+                        <li>Spieler: <span id="footerPlayerCount">-/-</span></li>
+                        <li>Version: <span id="footerServerVersion">-</span></li>
                         <li><a href="/admin">Admin Panel</a></li>
                     </ul>
                 </div>
@@ -1268,6 +1269,11 @@ if ($db->isConnected()) {
             const playerCountElement = document.getElementById('playerCount');
             const serverVersionElement = document.getElementById('serverVersion');
             const statusIcon = statusWidget.querySelector('.tile-icon');
+            
+            // Footer Elemente
+            const footerStatusElement = document.getElementById('footerServerStatus');
+            const footerPlayerCountElement = document.getElementById('footerPlayerCount');
+            const footerVersionElement = document.getElementById('footerServerVersion');
 
             // Fallback für Demo-Zwecke - zeigt statische Informationen
             // Für echte Server-Daten benötigen wir externe API-Schlüssel oder Server-Zugang
@@ -1304,6 +1310,20 @@ if ($db->isConnected()) {
                     if (serverVersionElement) {
                         serverVersionElement.textContent = data.version || '1.8+';
                     }
+                    
+                    // Footer Updates
+                    if (footerStatusElement) {
+                        footerStatusElement.textContent = 'Online';
+                        footerStatusElement.className = 'status-online';
+                    }
+                    
+                    if (footerPlayerCountElement) {
+                        footerPlayerCountElement.textContent = `${data.players.online}/${data.players.max}`;
+                    }
+                    
+                    if (footerVersionElement) {
+                        footerVersionElement.textContent = data.version || '1.8+';
+                    }
                 } else {
                     statusTile.className = 'tile-value status-offline';
                     statusTile.textContent = 'Offline';
@@ -1315,6 +1335,20 @@ if ($db->isConnected()) {
 
                     if (serverVersionElement) {
                         serverVersionElement.textContent = '-';
+                    }
+                    
+                    // Footer Updates
+                    if (footerStatusElement) {
+                        footerStatusElement.textContent = 'Offline';
+                        footerStatusElement.className = 'status-offline';
+                    }
+                    
+                    if (footerPlayerCountElement) {
+                        footerPlayerCountElement.textContent = '0/0';
+                    }
+                    
+                    if (footerVersionElement) {
+                        footerVersionElement.textContent = '-';
                     }
                 }
             } catch (error) {
@@ -1328,6 +1362,20 @@ if ($db->isConnected()) {
 
                 if (serverVersionElement) {
                     serverVersionElement.textContent = '-';
+                }
+                
+                // Footer Updates
+                if (footerStatusElement) {
+                    footerStatusElement.textContent = 'Wartung';
+                    footerStatusElement.className = 'status-offline';
+                }
+                
+                if (footerPlayerCountElement) {
+                    footerPlayerCountElement.textContent = '-/-';
+                }
+                
+                if (footerVersionElement) {
+                    footerVersionElement.textContent = '-';
                 }
             }
             

@@ -933,6 +933,11 @@ if ($db->isConnected()) {
                 font-size: 1.5rem;
             }
 
+            /* Mobile Spacer Anpassung */
+            .section + div[style*="height: 250px"] {
+                height: 150px !important;
+            }
+
             .cta-button {
                 padding: 0.7rem 1.2rem;
                 font-size: 0.9rem;

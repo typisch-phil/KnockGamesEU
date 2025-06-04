@@ -86,6 +86,9 @@ if ($db->isConnected()) {
         }
 
         .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             font-size: 2rem;
             font-weight: bold;
             color: #ff9124;
@@ -95,6 +98,14 @@ if ($db->isConnected()) {
 
         .logo:hover {
             text-shadow: 0 0 20px #ff9124;
+            transform: scale(1.05);
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 5px rgba(255, 145, 36, 0.5));
         }
 
         nav ul {
@@ -726,6 +737,11 @@ if ($db->isConnected()) {
             .logo {
                 font-size: 1.3rem;
             }
+            
+            .logo img {
+                width: 32px;
+                height: 32px;
+            }
         }
 
         /* Footer Styles */
@@ -841,7 +857,10 @@ if ($db->isConnected()) {
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="/index.php" class="logo">KnockGames.eu</a>
+                <a href="/index.php" class="logo">
+                    <img src="attached_assets/knockgameseu.png" alt="KnockGames.eu Logo">
+                    KnockGames.eu
+                </a>
                 <nav>
                     <ul>
                         <li><a href="#home">Home</a></li>

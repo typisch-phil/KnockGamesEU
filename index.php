@@ -737,6 +737,7 @@ if ($db->isConnected()) {
                 <nav>
                     <ul>
                         <li><a href="#home">Home</a></li>
+                        <li><a href="#announcements">Ankündigungen</a></li>
                         <li><a href="#training">Training</a></li>
                         <li><a href="#community">Community</a></li>
                         <li><a href="#news">News</a></li>

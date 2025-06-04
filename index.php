@@ -933,6 +933,18 @@ if ($db->isConnected()) {
                 font-size: 1.5rem;
             }
 
+            /* Mobile Spacer Anpassung - größere Abstände für kleine Bildschirme */
+            .section + div[style*="height: 250px"] {
+                height: 450px !important;
+            }
+            
+            /* Extra Abstand für sehr kleine Handys */
+            @media (max-width: 480px) {
+                .section + div[style*="height: 250px"] {
+                    height: 500px !important;
+                }
+            }
+
             .cta-button {
                 padding: 0.7rem 1.2rem;
                 font-size: 0.9rem;
@@ -1395,7 +1407,8 @@ if ($db->isConnected()) {
                 // Spezielle Behandlung für announcements Sektion
                 let offset = 300; // Standard-Offset
                 if (sectionId === 'announcements') {
-                    offset = 400; // Größerer Offset für Ankündigungen
+                    // Größerer Offset für Ankündigungen - mehr auf mobilen Geräten
+                    offset = window.innerWidth <= 768 ? 600 : 400;
                 } else if (sectionId === 'home') {
                     offset = 100; // Kleinerer Offset für Home
                 }
@@ -1455,7 +1468,8 @@ if ($db->isConnected()) {
                             
                             // Spezielle Offsets für verschiedene Sektionen
                             if (targetId === 'announcements') {
-                                headerHeight = 120; // Mehr Abstand für Ankündigungen
+                                // Mehr Abstand für Ankündigungen - deutlich mehr auf mobilen Geräten
+                                headerHeight = window.innerWidth <= 768 ? 200 : 120;
                             } else if (targetId === 'home') {
                                 headerHeight = 60; // Weniger Abstand für Home
                             }
